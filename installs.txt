@@ -1,0 +1,7 @@
+npx create-react-app tailorbook  //use this command to create a new React application (should be good)
+npm install react react-dom      // use this to install React
+npm install react-router-dom     //use this commands to install for routing
+npm install @mui/material @emotion/react @emotion/styled //use this command to install other styling dependancies
+npm install react-calendar       //use this command to install calendar dependencies
+npm install @mui/icons-material  //use this commands for the hamburger menu
+
