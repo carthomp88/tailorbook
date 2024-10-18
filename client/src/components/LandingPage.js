@@ -45,25 +45,25 @@ const LandingPage = () => {
       sx={{
         position: 'relative', // Set position relative for the Box
         height: '100vh', // Full viewport height
-        backgroundColor: 'black', // Black background color
+        backgroundColor: 'white', // Black background color
         overflow: 'hidden', // Hide overflow content
         margin: 0, // Remove any margin
         padding: 0, // Remove any padding
       }}
     >
-      <Box
-        component="img" // Set the component type to img
-        src={logo} // Set the source of the image to the logo
-        alt="Logo" // Alt text for the logo
-        sx={{
-          width: '100%', // Adjust width to fill the parent
-          maxWidth: '1200px', // Set a maximum width for the logo
-          position: 'absolute', // Position the logo absolutely
-          top: '20px', // Position logo 20px from the top
-          left: '50%', // Center the logo horizontally
-          transform: 'translateX(-50%)', // Adjust position to truly center the logo
-        }}
-      />
+        <Box
+    component="img" // Set the component type to img
+    src={logo} // Set the source of the image to the logo
+    alt="Logo" // Alt text for the logo
+    sx={{
+      width: '50%', // Adjust width to 50% of the viewport width
+      maxWidth: '700px', // Set a maximum width for the logo
+      position: 'absolute', // Position the logo absolutely
+      top: '60%', // Center the logo vertically
+      left: '50%', // Center the logo horizontally
+      transform: 'translate(-50%, -50%)', // Adjust position to truly center both vertically and horizontally
+    }}
+  />
       <Typography
         variant="h2" // Set typography variant to h2
         sx={{
@@ -71,7 +71,7 @@ const LandingPage = () => {
           top: '40px', // Position text 40px from the top
           left: '50%', // Center the text horizontally
           transform: 'translateX(-50%)', // Adjust position to truly center the text
-          color: 'white', // Set text color to white
+          color: 'black', // Set text color to white
         }}
       >
         Welcome to TailorBook

@@ -14,7 +14,6 @@ const images = {
   Facial: facialImage,
 };
 
-
 const services = [
   {
     name: 'Haircut',
@@ -64,64 +63,60 @@ const AvailableServices = () => {
   };
 
   return (
-    <Box sx={{ backgroundColor: 'black', height: '100vh', padding: '20px' }}>
-      {/* Header with blue background */}
-      <AppBar position="static" sx={{ backgroundColor: 'blue' }}>
+    <Box sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh', padding: '20px' }}>
+      {/* Header with white background and subtle shadow */}
+      <AppBar position="static" sx={{ backgroundColor: '#ffffff', boxShadow: 'none', borderBottom: '1px solid #e0e0e0' }}>
         <Toolbar>
-          <Typography variant="h4" sx={{ flexGrow: 1, textAlign: 'center', color: 'white' }}>
+          <Typography variant="h4" sx={{ flexGrow: 1, textAlign: 'center', color: '#000000', fontWeight: 'bold' }}>
             Available Services
           </Typography>
           <IconButton edge="end" color="inherit" aria-label="menu" onClick={handleMenuOpen}>
-            <MenuIcon />
+            <MenuIcon sx={{ color: '#000000' }} />
           </IconButton>
         </Toolbar>
       </AppBar>
 
       {/* Services Container */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: '20px', marginTop: '20px' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: '20px', marginTop: '20px', flexWrap: 'wrap' }}>
         {services.map((service) => (
           <Box
             key={service.name}
             sx={{
-              backgroundColor: 'red',
-              color: 'white',
+              backgroundColor: '#ffffff',
+              color: '#000000',
               flex: 1,
               padding: '20px',
               borderRadius: '10px',
-              boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)',
+              boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)', // Subtle shadow for modern effect
               textAlign: 'center',
+              minWidth: '250px', // Minimum width for responsive layout
+              maxWidth: '400px', // Max width for service boxes
             }}
           >
-            <Typography variant="h5" sx={{ marginBottom: '20px' }}>
+            <Typography variant="h5" sx={{ marginBottom: '20px', fontWeight: 'bold' }}>
               {service.name}
             </Typography>
-            <hr style={{ borderColor: 'white', margin: '20px 0' }} />
-            <Typography variant="body1" sx={{ marginBottom: '10px' }}>
+            <Typography variant="body1" sx={{ marginBottom: '10px', color: '#555' }}>
               {service.description}
             </Typography>
-            <hr style={{ borderColor: 'white', margin: '20px 0' }} />
-            <Typography variant="body1" sx={{ marginBottom: '10px' }}>
+            <Typography variant="body2" sx={{ marginBottom: '10px', color: '#777' }}>
               Expected Time: {service.time}
             </Typography>
-            <hr style={{ borderColor: 'white', margin: '20px 0' }} />
-            <Typography variant="body1" sx={{ marginBottom: '10px' }}>
+            <Typography variant="body2" sx={{ marginBottom: '20px', color: '#777' }}>
               Price: {service.price}
             </Typography>
-            <hr style={{ borderColor: 'white', margin: '20px 0' }} />
             <Box
               sx={{
-                backgroundColor: 'grey',
+                backgroundColor: '#e0e0e0',
                 width: '100%',
-                height: '450px',
-                marginTop: '40px',
+                height: '200px',
                 backgroundImage: `url(${service.image})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 borderRadius: '8px',
+                marginBottom: '20px',
               }}
-            >
-              {/* Placeholder for image */}
-            </Box>
+            />
           </Box>
         ))}
       </Box>
