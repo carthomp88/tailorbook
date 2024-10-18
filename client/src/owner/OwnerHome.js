@@ -24,80 +24,86 @@ const OwnerHome = () => {
   };
 
   return (
-    <Box sx={{ backgroundColor: 'black', height: '100vh' }}> {/* Set the background color to black */}
-      <AppBar position="static" sx={{ backgroundColor: 'purple' }}> {/* Header background color */}
+    <Box sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh', paddingBottom: '100px' }}> {/* Light background with space for the footer */}
+      {/* AppBar with a modern white background and subtle shadow */}
+      <AppBar position="static" sx={{ backgroundColor: '#ffffff', boxShadow: 'none', borderBottom: '1px solid #e0e0e0' }}>
         <Toolbar>
-          <Typography variant="h4" sx={{ flexGrow: 1, textAlign: 'center', color: 'white' }}> {/* Header text color */}
+          <Typography variant="h4" sx={{ flexGrow: 1, textAlign: 'center', color: '#000000', fontWeight: 'bold' }}>
             Owner Home
           </Typography>
           <IconButton edge="end" color="inherit" aria-label="menu" onClick={handleMenuOpen}>
-            <MenuIcon /> {/* Hamburger menu icon */}
+            <MenuIcon sx={{ color: '#000000' }} /> {/* Modern black hamburger menu icon */}
           </IconButton>
         </Toolbar>
       </AppBar>
 
       {/* Main container for layout */}
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: '20px' }}>
-        {/* Left vertical rectangle */}
+        {/* Left box for pictures */}
         <Box sx={{
-          backgroundColor: 'purple',
-          width: '200px',
-          height: '400px',
+          backgroundColor: '#ffffff',
+          width: '200px', // Smaller width for a cleaner look
+          height: '300px', // Smaller height
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          margin: '200px',
-          marginTop: '100px',
+          margin: '30px', // Reduced margin for smaller spacing
+          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)', // Subtle shadow for modern effect
+          borderRadius: '10px', // Rounded corners
         }}>
-          <TextField variant="outlined" placeholder="Insert Picture" sx={{ width: '80%', backgroundColor: 'white' }} />
+          <TextField variant="outlined" placeholder="Insert Picture" sx={{ width: '80%', backgroundColor: '#f5f5f5' }} /> {/* Lighter background */}
         </Box>
 
-        {/* Middle large vertical rectangle */}
+        {/* Middle large vertical rectangle for editable business info */}
         <Box sx={{
-          backgroundColor: 'purple',
-          width: '400px',
-          height: '400px',
+          backgroundColor: '#ffffff',
+          width: '300px', // Reduced width for a modern look
+          height: '300px', // Reduced height
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'space-around',
-          margin: '10px',
-          marginTop: '100px',
+          margin: '30px', // Reduced margin
+          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)', // Subtle shadow for modern effect
+          borderRadius: '10px', // Rounded corners
+          padding: '20px',
         }}>
-          <TextField variant="outlined" placeholder="Edit Business Name" sx={{ width: '80%', backgroundColor: 'white' }} />
-          <TextField variant="outlined" placeholder="Edit Business Info" sx={{ width: '80%', backgroundColor: 'white' }} />
-          <TextField variant="outlined" placeholder="Edit Business Hours" sx={{ width: '80%', backgroundColor: 'white' }} />
+          <TextField variant="outlined" placeholder="Edit Business Name" sx={{ width: '80%', backgroundColor: '#f5f5f5' }} />
+          <TextField variant="outlined" placeholder="Edit Business Info" sx={{ width: '80%', backgroundColor: '#f5f5f5' }} />
+          <TextField variant="outlined" placeholder="Edit Business Hours" sx={{ width: '80%', backgroundColor: '#f5f5f5' }} />
         </Box>
 
-        {/* Right vertical rectangle */}
+        {/* Right box for pictures */}
         <Box sx={{
-          backgroundColor: 'purple',
-          width: '200px',
-          height: '400px',
+          backgroundColor: '#ffffff',
+          width: '200px', // Smaller width for a cleaner look
+          height: '300px', // Smaller height
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          margin: '200px',
-          marginTop: '100px',
+          margin: '30px', // Reduced margin
+          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)', // Subtle shadow for modern effect
+          borderRadius: '10px', // Rounded corners
         }}>
-          <TextField variant="outlined" placeholder="Insert Picture" sx={{ width: '80%', backgroundColor: 'white' }} />
+          <TextField variant="outlined" placeholder="Insert Picture" sx={{ width: '80%', backgroundColor: '#f5f5f5' }} /> {/* Lighter background */}
         </Box>
       </Box>
 
-      {/* Bottom horizontal rectangle */}
+      {/* Fixed bottom bar for contact information */}
       <Box sx={{
-        backgroundColor: 'purple',
+        backgroundColor: '#ffffff',
         width: '100%',
         height: '100px',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-around', // Space out text boxes evenly
-        position: 'absolute',
-        bottom: '0',
+        justifyContent: 'space-around',
+        position: 'fixed', // Fixed position at the bottom
+        bottom: '0', // Stick to the bottom
+        boxShadow: '0 -4px 10px rgba(0, 0, 0, 0.1)', // Subtle shadow at the bottom
       }}>
-        <TextField variant="outlined" placeholder="Insert Email" sx={{ width: '30%', backgroundColor: 'white' }} />
-        <TextField variant="outlined" placeholder="Insert Phone Number" sx={{ width: '30%', backgroundColor: 'white' }} />
-        <TextField variant="outlined" placeholder="Insert Social Media" sx={{ width: '30%', backgroundColor: 'white' }} />
+        <TextField variant="outlined" placeholder="Insert Email" sx={{ width: '30%', backgroundColor: '#f5f5f5' }} />
+        <TextField variant="outlined" placeholder="Insert Phone Number" sx={{ width: '30%', backgroundColor: '#f5f5f5' }} />
+        <TextField variant="outlined" placeholder="Insert Social Media" sx={{ width: '30%', backgroundColor: '#f5f5f5' }} />
       </Box>
 
       {/* Hamburger menu for navigation */}
@@ -106,8 +112,8 @@ const OwnerHome = () => {
         open={Boolean(anchorEl)} // Open state of the menu
         onClose={handleMenuClose} // Close the menu
       >
-        <MenuItem onClick={() => handleNavigation('/owner/calendar')}>Owner Calendar</MenuItem> {/* Navigate to Owner Page 1 */}
-        <MenuItem onClick={() => handleNavigation('/owner/services')}>Owner Services</MenuItem> {/* Navigate to Owner Page 2 */}
+        <MenuItem onClick={() => handleNavigation('/owner/calendar')}>Owner Calendar</MenuItem> {/* Navigate to Owner Calendar */}
+        <MenuItem onClick={() => handleNavigation('/owner/services')}>Owner Services</MenuItem> {/* Navigate to Owner Services */}
         <MenuItem onClick={handleMenuClose}>Close</MenuItem> {/* Close the menu */}
       </Menu>
     </Box>

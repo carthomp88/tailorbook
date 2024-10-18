@@ -6,10 +6,9 @@ import haircutImage from './haircut.jpg';
 import massageImage from './massage.jpg';
 
 const images = {
-    Haircut: haircutImage,
-    Massage: massageImage,
-  };
-  
+  Haircut: haircutImage,
+  Massage: massageImage,
+};
 
 const CustomerHome = () => {
   const navigate = useNavigate(); // Initialize useNavigate for navigation
@@ -32,36 +31,38 @@ const CustomerHome = () => {
   };
 
   return (
-    <Box sx={{ backgroundColor: 'black', height: '100vh' }}> {/* Set the background color to black */}
-      <AppBar position="static" sx={{ backgroundColor: 'blue' }}> {/* Header background color */}
+    <Box sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh', paddingBottom: '100px' }}> {/* Light background and space for the bottom bar */}
+      <AppBar position="static" sx={{ backgroundColor: '#ffffff', boxShadow: 'none', borderBottom: '1px solid #e0e0e0' }}> {/* Clean white AppBar */}
         <Toolbar>
-          <Typography variant="h4" sx={{ flexGrow: 1, textAlign: 'center', color: 'white' }}> {/* Header text color */}
+          <Typography variant="h4" sx={{ flexGrow: 1, textAlign: 'center', color: '#000000', fontWeight: 'bold' }}> {/* Black bold text */}
             Customer Home
           </Typography>
           <IconButton edge="end" color="inherit" aria-label="menu" onClick={handleMenuOpen}>
-            <MenuIcon /> {/* Hamburger menu icon */}
+            <MenuIcon sx={{ color: '#000000' }} /> {/* Black hamburger menu icon */}
           </IconButton>
         </Toolbar>
       </AppBar>
 
       {/* Main container for layout */}
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: '20px' }}>
-        {/* Left vertical rectangle for pictures only */}
+        {/* Left vertical rectangle for pictures */}
         <Box sx={{
-          backgroundColor: 'red',
+          backgroundColor: '#ffffff',
           width: '300px',
           height: '600px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           margin: '50px',
+          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)', // Subtle shadow for modern effect
+          borderRadius: '10px', // Rounded corners
         }}>
-         <img src={images.Haircut} alt="Service 2" style={{ maxWidth: '100%', maxHeight: '100%', height: '400px', }} /> {/* Insert picture here */}
+          <img src={images.Haircut} alt="Service 1" style={{ maxWidth: '100%', maxHeight: '100%', height: '400px', borderRadius: '10px' }} /> {/* Rounded corners for images */}
         </Box>
 
         {/* Middle large vertical rectangle for available services */}
         <Box sx={{
-          backgroundColor: 'red',
+          backgroundColor: '#ffffff',
           width: '400px',
           height: '600px',
           display: 'flex',
@@ -69,44 +70,49 @@ const CustomerHome = () => {
           alignItems: 'center',
           justifyContent: 'space-around',
           margin: '50px',
+          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)', // Subtle shadow for modern effect
+          borderRadius: '10px', // Rounded corners
+          padding: '20px', // Padding inside the box
         }}>
-          <Typography variant = "h2" sx={{ color: 'white' }}>Gabe's Spa & Salon</Typography>
-          <Typography variant = "h5" sx={{ color: 'white' }}>Welcome to Gabe's Spa & Salon!</Typography>
-          <Typography variant = "h5" sx={{ color: 'white' }}>Your oasis for relaxation and beauty</Typography>
-          <Typography variant = "h5" sx={{ color: 'white' }}>Hours : M-S : 9-5     Sundays: Closed</Typography>
+          <Typography variant="h2" sx={{ color: '#000000', fontWeight: 'bold' }}>Gabe's Spa & Salon</Typography>
+          <Typography variant="h5" sx={{ color: '#555555' }}>Welcome to Gabe's Spa & Salon!</Typography>
+          <Typography variant="h5" sx={{ color: '#555555' }}>Your oasis for relaxation and beauty</Typography>
+          <Typography variant="h5" sx={{ color: '#555555' }}>Hours: M-S: 9-5 | Sundays: Closed</Typography>
         </Box>
 
-        {/* Right vertical rectangle for pictures only */}
+        {/* Right vertical rectangle for pictures */}
         <Box sx={{
-          backgroundColor: 'red',
+          backgroundColor: '#ffffff',
           width: '300px',
           height: '600px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           margin: '50px',
+          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)', // Subtle shadow for modern effect
+          borderRadius: '10px', // Rounded corners
         }}>
-          <img src={images.Massage} alt="Service 2" style={{ maxWidth: '100%', maxHeight: '100%', height: '400px', }} /> {/* Insert picture here */}
+          <img src={images.Massage} alt="Service 2" style={{ maxWidth: '100%', maxHeight: '100%', height: '400px', borderRadius: '10px' }} /> {/* Rounded corners for images */}
         </Box>
       </Box>
 
-      {/* Bottom horizontal rectangle with non-editable text */}
-      <Box sx={{
-        backgroundColor: 'red',
+       {/* Fixed bottom bar for contact information */}
+       <Box sx={{
+        backgroundColor: '#ffffff',
         width: '100%',
         height: '100px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between', // Space out text boxes
-        position: 'absolute',
-        bottom: '0',
-        padding: '0 20px', // Add some padding to the sides
+        position: 'fixed', // Fixed at the bottom
+        bottom: '0', // Stick to the bottom of the viewport
+        padding: '0 20px', // Add padding to the sides
+        boxShadow: '0 -4px 10px rgba(0, 0, 0, 0.1)', // Subtle shadow at the bottom
       }}>
-        <Typography sx={{ color: 'white', width: '30%', textAlign: 'right' }}>Email: example@business.com</Typography>
-        <Typography sx={{ color: 'white', width: '30%', textAlign: 'center' }}>Phone Number: (123) 456-7890</Typography>
-        <Typography sx={{ color: 'white', width: '30%', textAlign: 'left' }}>Social Media: @businessname</Typography>
+        <Typography sx={{ color: '#555555', width: '30%', textAlign: 'right' }}>Email: example@business.com</Typography>
+        <Typography sx={{ color: '#555555', width: '30%', textAlign: 'center' }}>Phone Number: (123) 456-7890</Typography>
+        <Typography sx={{ color: '#555555', width: '30%', textAlign: 'left' }}>Social Media: @businessname</Typography>
       </Box>
-
       {/* Hamburger menu for navigation */}
       <Menu
         anchorEl={anchorEl} // Anchor element for the menu
