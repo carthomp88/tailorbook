@@ -8,6 +8,7 @@ const express = require('express')
 const app = express()
 
 const customerRouter = require('./routes/customer.js')
+const ownerRouter = require('./routes/owner.js')
 const indexRouter = require('./routes/index.js')
 
 const mongoose = require('mongoose')
@@ -19,6 +20,7 @@ db.once('open', () => console.log('Connected to MongoDB'))
 app.use(cors())
 
 app.use('/customer', customerRouter)
+app.use('/owner', ownerRouter)
 app.use('/', indexRouter)
 
 
