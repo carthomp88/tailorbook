@@ -12,6 +12,8 @@ import CustomerCalendar from './customer/CustomerCalendar';
 import OwnerServices from './owner/OwnerServices';
 import CustomerServices from './customer/CustomerServices';
 
+const cors = require('cors')
+
 function App() {
   return (
     <Router>

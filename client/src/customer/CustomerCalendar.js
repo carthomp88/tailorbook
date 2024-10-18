@@ -6,6 +6,10 @@ import { useNavigate } from 'react-router-dom';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import axios from 'axios'
+
+// Grab calendar data way up here
+const res = await axios.get('http://localhost:8080/customer/calendar')
 
 // Create a localizer for the calendar using moment.js, which will handle date parsing and formatting.
 const localizer = momentLocalizer(moment);
@@ -32,14 +36,16 @@ const CustomerCalendar = () => {
     '2024-10-12': ['Facial', 'Pedicure', 'Massage'],
   };
 
-  // Define initial events for the calendar. In this case, a dummy event is provided for display purposes.
-  const [events] = useState([
-    {
-      title: 'Sample Service', // Title of the event displayed on the calendar.
-      start: new Date(), // Start time of the event.
-      end: new Date(moment().add(1, 'hours')), // End time of the event, set to one hour after the start.
-    },
-  ]);
+  
+  // Populate events with calendar data from server
+  const appointmentData = res.data.array
+  
+  const appointments = []
+  appointmentData.forEach((obj) => {
+    const date = new Date(obj.date)
+    appointments.push({title: obj.type, start: new Date(date), end: new Date(moment(date).add(1, 'hours')) })
+  })
+  const [events] = useState(appointments);
 
   // Function to handle when a date is selected on the calendar.
   // This function will update the selectedDate state and reset the selected service.

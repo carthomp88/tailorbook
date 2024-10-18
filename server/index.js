@@ -2,8 +2,13 @@ if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config()
 }
 
+const cors = require('cors')
+
 const express = require('express')
 const app = express()
+
+const customerRouter = require('./routes/customer.js')
+const indexRouter = require('./routes/index.js')
 
 const mongoose = require('mongoose')
 mongoose.connect(process.env.DATABASE_URL)
@@ -11,10 +16,12 @@ const db = mongoose.connection
 db.on('error', error => console.error(error))
 db.once('open', () => console.log('Connected to MongoDB'))
 
-app.post('/', (req, res) => {
-    console.log('Received a post request!')
-})
+app.use(cors())
 
-app.listen(8080 , () =>{
+app.use('/customer', customerRouter)
+app.use('/', indexRouter)
+
+
+app.listen(process.env.PORT || 8080, () =>{
     console.log('server listening on port 8080')
 })

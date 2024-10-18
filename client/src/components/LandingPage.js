@@ -31,7 +31,6 @@ const LandingPage = () => {
     setEmail(''); // Reset email state
     setPassword(''); // Reset password state
     handleClose(); // Close the login dialog
-    dbCall();
 
     // Navigate to the respective home page based on user type
     // NEED TO UPDATE WITH ACTUAL LOGINS BUT GOES TO CORRECT SIDE BASED ON CUSTOMER OR OWNER
@@ -41,11 +40,6 @@ const LandingPage = () => {
       navigate('/owner/home'); // Navigate to Owner Home
     }
   };
-
-  const dbCall = (email, pwd) => {
-    console.log("testing 1")
-    //axios.post('/', {}).then()
-  }
 
   return (
     <Box
