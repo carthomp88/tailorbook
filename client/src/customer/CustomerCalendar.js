@@ -16,27 +16,19 @@ const localizer = momentLocalizer(moment);
 
 // Define the main functional component for the Customer Calendar page.
 const CustomerCalendar = () => {
-  // Hook to manage navigation between different routes/pages.
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Hook to manage navigation between different routes/pages.
 
-  // State variable to manage the anchor element for the dropdown menu (used for the hamburger menu).
-  const [anchorEl, setAnchorEl] = useState(null);
-
-  // State variable to store the currently selected service from the dropdown menu.
-  const [selectedService, setSelectedService] = useState('');
-
-  // State variable to store the selected date from the calendar.
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null); // State variable to manage the anchor element for the dropdown menu.
+  const [selectedService, setSelectedService] = useState(''); // State variable to store the selected service from the dropdown.
+  const [selectedDate, setSelectedDate] = useState(null); // State variable to store the selected date from the calendar.
 
   // Object defining available services based on specific dates.
-  // Each key represents a date, and the value is an array of services available on that date.
   const serviceAvailability = {
     '2024-10-10': ['Haircut', 'Massage'],
     '2024-10-11': ['Haircut', 'Manicure'],
     '2024-10-12': ['Facial', 'Pedicure', 'Massage'],
   };
-
-  
+ 
   // Populate events with calendar data from server
   const appointmentData = res.data.array
   
@@ -47,119 +39,102 @@ const CustomerCalendar = () => {
   })
   const [events] = useState(appointments);
 
-  // Function to handle when a date is selected on the calendar.
-  // This function will update the selectedDate state and reset the selected service.
+  // Handle date selection on the calendar.
   const handleDateSelect = (slotInfo) => {
-    // Format the selected date to 'YYYY-MM-DD' using moment.js for consistency.
-    const selectedDate = moment(slotInfo.start).format('YYYY-MM-DD');
-
-    // Update the state to store the selected date.
-    setSelectedDate(selectedDate);
-
-    // Clear previously selected service when the date changes.
-    setSelectedService('');
+    const selectedDate = moment(slotInfo.start).format('YYYY-MM-DD'); // Format the selected date.
+    setSelectedDate(selectedDate); // Update the state with the selected date.
+    setSelectedService(''); // Reset selected service when the date changes.
   };
 
-  // Determine the available services for the currently selected date.
-  // If a date is selected and it exists in the serviceAvailability object, return the list of services for that date.
-  // Otherwise, return an empty array.
+  // Get available services for the selected date.
   const availableServices = selectedDate && serviceAvailability[selectedDate] ? serviceAvailability[selectedDate] : [];
 
-  // Function to handle the change in the selected service when the user selects a new option from the dropdown.
+  // Handle service selection in the dropdown.
   const handleServiceChange = (event) => {
-    // Update the state to store the newly selected service.
-    setSelectedService(event.target.value);
+    setSelectedService(event.target.value); // Update selected service.
   };
 
-  // Function to open the dropdown menu (triggered by the hamburger icon).
-  // The event provides the element to which the menu should be anchored.
+  // Handle the opening of the hamburger menu.
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
-  // Function to close the dropdown menu.
+  // Handle the closing of the hamburger menu.
   const handleMenuClose = () => {
-    // Clear the anchor element to indicate that the menu should be closed.
     setAnchorEl(null);
   };
 
-  // Function to handle navigation to a different page when a menu item is clicked.
+  // Navigate to a specific page.
   const handleNavigation = (path) => {
-    // Use the navigate function to go to the specified path.
-    navigate(path);
-
-    // Close the menu after navigating.
-    handleMenuClose();
+    navigate(path); // Use the navigate function to move to a different route.
+    handleMenuClose(); // Close the menu after navigating.
   };
 
-  // Return the JSX structure for rendering the Customer Calendar component.
+  // Return the main JSX structure.
   return (
-    // Main container for the component. Uses Material-UI's Box component for layout.
-    <Box sx={{ backgroundColor: 'black', height: '100vh' }}>
-      {/* AppBar component to display the page header with the title and hamburger menu. */}
-      <AppBar position="static" sx={{ backgroundColor: 'blue' }}>
+    <Box sx={{ backgroundColor: '#f5f5f5', height: '100vh', padding: '20px' }}>
+      {/* AppBar with page title and menu button */}
+      <AppBar position="static" sx={{ backgroundColor: '#ffffff', boxShadow: 'none', borderBottom: '1px solid #e0e0e0' }}>
         <Toolbar>
-          {/* Centered title for the Customer Calendar. */}
-          <Typography variant="h4" sx={{ flexGrow: 1, textAlign: 'center', color: 'white' }}>
+          <Typography variant="h4" sx={{ flexGrow: 1, textAlign: 'center', color: '#000000', fontWeight: 'bold' }}>
             Customer Calendar
           </Typography>
-
-          {/* IconButton to open the menu. Uses the MenuIcon from MUI. */}
           <IconButton edge="end" color="inherit" aria-label="menu" onClick={handleMenuOpen}>
-            <MenuIcon />
+            <MenuIcon sx={{ color: '#000000' }} />
           </IconButton>
         </Toolbar>
       </AppBar>
 
-      {/* Text box displaying instructions for the user, asking them to select a date to view available services. */}
+      {/* Instructional message */}
       <Box sx={{ backgroundColor: 'white', color: 'black', padding: '10px', textAlign: 'center', marginTop: '10px' }}>
         Select a date to see available services
       </Box>
 
-      {/* Main layout container with the calendar on the left and service selection on the right. */}
+      {/* Layout container with calendar on the left and service dropdown on the right */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', padding: '20px' }}>
-        {/* Container for the calendar component. Sets dimensions and styling. */}
-        <Box sx={{ 
-          width: '70%', 
-          height: '800px', 
-          overflow: 'hidden', 
-          border: '1px solid #ccc', 
-          backgroundColor: '#fff', 
-          boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-        }}>
+        {/* Calendar section */}
+        <Box
+          sx={{
+            width: '70%',
+            height: '800px',
+            overflow: 'hidden',
+            border: '1px solid #ccc',
+            backgroundColor: '#fff',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+          }}
+        >
           <Calendar
-            localizer={localizer} // Set up the calendar's date localization using the moment.js localizer.
-            events={events} // Pass in the events to be displayed on the calendar.
-            startAccessor="start" // Specify the start time field for events.
-            endAccessor="end" // Specify the end time field for events.
-            style={{ height: '100%', width: '100%' }} // Set the size of the calendar.
-            selectable // Enable date selection on the calendar.
-            onSelectSlot={handleDateSelect} // Attach the function that handles date selection.
+            localizer={localizer} // Moment.js localizer for dates.
+            events={events} // Example events.
+            startAccessor="start"
+            endAccessor="end"
+            style={{ height: '100%', width: '100%' }}
+            selectable // Enable date selection.
+            onSelectSlot={handleDateSelect} // Handle date selection.
           />
         </Box>
 
-        {/* Service selection dropdown container. Aligns the dropdown vertically with space between elements. */}
+        {/* Service dropdown section */}
         <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <Select
-            value={selectedService} // Set the currently selected value.
-            onChange={handleServiceChange} // Attach the function to handle changes to the selected service.
-            variant="outlined" // Use an outlined style for the dropdown.
-            sx={{ 
-              backgroundColor: 'white', 
-              width: '400px', 
-              height: '100px', 
-              marginTop: '50px', 
-              fontSize: '24px', 
+            value={selectedService} // Currently selected service.
+            onChange={handleServiceChange} // Handle service selection.
+            variant="outlined"
+            sx={{
+              backgroundColor: 'white',
+              width: '400px',
+              height: '100px',
+              marginTop: '50px',
+              fontSize: '24px',
               padding: '10px',
             }}
-            disabled={!selectedDate} // Disable the dropdown if no date has been selected yet.
+            disabled={!selectedDate} // Disable if no date selected.
           >
-            {/* Placeholder text shown when no service is selected. Changes based on whether a date is selected. */}
             <MenuItem value="" disabled>
               {selectedDate ? 'Select a Service' : 'Select a Date First'}
             </MenuItem>
 
-            {/* Map over the available services and render each as a menu item in the dropdown. */}
+            {/* Render available services in the dropdown */}
             {availableServices.map((service) => (
               <MenuItem key={service} value={service} sx={{ fontSize: '24px' }}>
                 {service}
@@ -169,30 +144,29 @@ const CustomerCalendar = () => {
         </Box>
       </Box>
 
-      {/* Button for booking the selected service. Only enabled if a service has been selected. */}
+      {/* Booking button */}
       <Button
         variant="contained"
         sx={{
-          position: 'fixed', // Fix the button position at the bottom-right corner of the screen.
+          position: 'fixed',
           bottom: '20px',
           right: '20px',
           backgroundColor: 'blue',
           color: 'white',
-          padding: '30px 60px', // Increase padding for a larger button size.
-          fontSize: '32px', // Increase font size for better visibility.
+          padding: '30px 60px',
+          fontSize: '32px',
         }}
-        disabled={!selectedService} // Disable the button if no service is selected.
+        disabled={!selectedService} // Disable if no service selected.
       >
         Book Now
       </Button>
 
-      {/* Menu component for navigation options. Triggered by the hamburger icon. */}
+      {/* Navigation menu */}
       <Menu
-        anchorEl={anchorEl} // Anchor the menu to the element that triggered it.
-        open={Boolean(anchorEl)} // Open the menu if the anchor element exists.
-        onClose={handleMenuClose} // Attach the function to close the menu.
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
       >
-        {/* Each menu item navigates to a different page. */}
         <MenuItem onClick={() => handleNavigation('/customer/home')}>Customer Home</MenuItem>
         <MenuItem onClick={() => handleNavigation('/customer/services')}>Customer Services</MenuItem>
         <MenuItem onClick={handleMenuClose}>Close</MenuItem>
@@ -201,5 +175,4 @@ const CustomerCalendar = () => {
   );
 };
 
-// Export the component for use in other parts of the application.
 export default CustomerCalendar;
