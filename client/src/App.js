@@ -1,6 +1,5 @@
 
 import React from 'react';
-import axios from 'axios';
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LandingPage from './components/LandingPage';
@@ -11,8 +10,6 @@ import OwnerCalendar from './owner/OwnerCalendar';
 import CustomerCalendar from './customer/CustomerCalendar';
 import OwnerServices from './owner/OwnerServices';
 import CustomerServices from './customer/CustomerServices';
-
-const cors = require('cors')
 
 function App() {
   return (

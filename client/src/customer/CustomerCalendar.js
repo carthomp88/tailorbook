@@ -35,7 +35,7 @@ const CustomerCalendar = () => {
   const appointments = []
   appointmentData.forEach((obj) => {
     const date = new Date(obj.date)
-    appointments.push({title: obj.type, start: new Date(date), end: new Date(moment(date).add(1, 'hours')) })
+    appointments.push({title: 'Unavailable', start: new Date(date), end: new Date(moment(date).add(1, 'hours')) })
   })
   const [events] = useState(appointments);
 

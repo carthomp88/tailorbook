@@ -1,5 +1,5 @@
 import React, { useState } from 'react'; // Import React and useState for managing component state
-import axios from 'axios' // Import Axios for API calls to the backend
+// import axios from 'axios' // Import Axios for API calls to the backend
 import { Box, Button, Typography, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Link } from '@mui/material'; // Import necessary Material-UI components
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for routing
 import logo from './TailorBook.png'; // Import logo image
