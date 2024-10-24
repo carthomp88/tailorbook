@@ -11,6 +11,20 @@ import axios from 'axios';
 // Grab calendar data way up here
 const res = await axios.get('http://localhost:8080/customer/calendar');
 
+async function postData(url = "", data = {}) {
+  const response = await fetch(url, {
+    method: "POST",
+    mode: "cors",
+    cache: "no-cache",
+    credentials: "same-origin",
+    headers: { "Content-Type": "application/json" },
+    redirect: "follow",
+    referrerPolicy: "no-referrer",
+    body: JSON.stringify(data),
+  });
+  return response.json();
+}
+
 // Create a localizer for the calendar using moment.js, which will handle date parsing and formatting.
 const localizer = momentLocalizer(moment);
 
@@ -25,7 +39,8 @@ const CustomerCalendar = () => {
   const [showCheckoutPopup, setShowCheckoutPopup] = useState(false); // State to manage checkout popup visibility.
 
   // New state variables for customer contact info and credit card details
-  const [customerName, setCustomerName] = useState('');
+  const [customerFirstName, setCustomerFirstName] = useState('');
+  const [customerLastName, setCustomerLastName] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [cardNumber, setCardNumber] = useState('');
@@ -42,7 +57,7 @@ const CustomerCalendar = () => {
   };
 
   // Sample appointment data for testing unavailable slots next week
-  const appointmentData = [
+  const sampleAppointments = [
     { date: '2024-10-30T10:00:00' }, // October 30th, 10 AM
     { date: '2024-10-31T13:00:00' }, // October 31st, 1 PM
     { date: '2024-11-01T09:00:00' }, // November 1st, 9 AM
@@ -50,8 +65,16 @@ const CustomerCalendar = () => {
     { date: '2024-11-03T16:00:00' }, // November 3rd, 4 PM
   ];
 
-  // Populate events with calendar data from server
   const appointments = [];
+
+  const appointmentData = res.data.array
+
+  sampleAppointments.forEach(aptmt => {
+    const date = new Date(aptmt.date);
+    appointments.push({ title: 'Unavailable', start: new Date(date), end: new Date(moment(date).add(1, 'hours')) });
+  })
+
+  // Populate events with calendar data from server
   appointmentData.forEach((obj) => {
     const date = new Date(obj.date);
     appointments.push({ title: 'Unavailable', start: new Date(date), end: new Date(moment(date).add(1, 'hours')) });
@@ -74,6 +97,19 @@ const CustomerCalendar = () => {
   const handleServiceChange = (event) => {
     setSelectedService(event.target.value); // Update selected service.
   };
+
+  const handleFormSend = () => {
+    const data = {
+      date: new Date('' + selectedDate + 'T' + selectedTime),
+      firstName: customerFirstName,
+      lastName: customerLastName,
+      email: customerEmail,
+      phonenum: customerPhone,
+      type: selectedService
+    }
+    postData("http://localhost:8080/customer/book", data)
+    handleCheckoutClose()
+  }
 
   // Handle time selection based on the selected service and date
   const handleTimeChange = (event) => {
@@ -105,12 +141,15 @@ const CustomerCalendar = () => {
   const handleCheckoutClose = () => {
     setShowCheckoutPopup(false); // Hide the checkout popup.
     // Clear the form fields when closing the popup
-    setCustomerName('');
+    setCustomerFirstName('');
+    setCustomerLastName('');
     setCustomerEmail('');
     setCustomerPhone('');
     setCardNumber('');
     setCardExpiration('');
     setCardCVC('');
+    setSelectedService('');
+    setSelectedTime('');
   };
 
   // Return the main JSX structure.
@@ -253,9 +292,17 @@ const CustomerCalendar = () => {
 
           {/* Customer contact info fields */}
           <TextField
-            label="Name"
-            value={customerName}
-            onChange={(e) => setCustomerName(e.target.value)}
+            label="First Name"
+            value={customerFirstName}
+            onChange={(e) => setCustomerFirstName(e.target.value)}
+            variant="outlined"
+            fullWidth
+            margin="normal"
+          />
+          <TextField
+            label="Last Name"
+            value={customerLastName}
+            onChange={(e) => setCustomerLastName(e.target.value)}
             variant="outlined"
             fullWidth
             margin="normal"
@@ -306,8 +353,11 @@ const CustomerCalendar = () => {
           <Typography variant="h6" sx={{ marginBottom: '20px', marginTop: '20px' }}>
             Thank you for your booking!
           </Typography>
+          <Button variant="contained" onClick={handleFormSend}>
+            Submit and Book
+          </Button>
           <Button variant="contained" onClick={handleCheckoutClose}>
-            Close
+            Cancel
           </Button>
         </Box>
       )}
