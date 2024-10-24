@@ -6,7 +6,8 @@ const userSchema = new Schema({
     lastName: String,
     email: String,
     phonenum: Number,
-    username: String
+    password: String,
+    type: String
 })
 
 const User = model('User', userSchema)

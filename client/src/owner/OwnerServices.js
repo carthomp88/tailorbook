@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { AppBar, Box, IconButton, Menu, MenuItem, TextField, Toolbar, Typography, List, ListItem, ListItemText, Fab, Button } from '@mui/material';
 import { Menu as MenuIcon, Delete as DeleteIcon, Add as AddIcon, Edit as EditIcon } from '@mui/icons-material'; // Icons for deleting, adding, and editing services
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios'
+
+const res = await axios.get('http://localhost:8080/owner/services')
 
 const OwnerServices = () => {
   const navigate = useNavigate(); // Initialize useNavigate for navigation
@@ -13,6 +16,17 @@ const OwnerServices = () => {
   const [editingIndex, setEditingIndex] = useState(null); // Track which service is being edited
   const [showForm, setShowForm] = useState(false); // Toggle between service list and form view
   const [services, setServices] = useState([]); // State to store the list of services
+
+  const serviceData = res.data.array
+  serviceData.forEach((obj) => {
+    services.push({
+      name: obj.name, 
+      description: obj.desc, 
+      time: '' + obj.time + ' minutes',
+      price: '' + obj.price,
+      image: obj.imgURL
+    })
+  })
 
   // Handle menu open
   const handleMenuOpen = (event) => {
