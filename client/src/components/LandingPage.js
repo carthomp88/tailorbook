@@ -1,8 +1,22 @@
 import React, { useState } from 'react'; // Import React and useState for managing component state
-import axios from 'axios' // Import Axios for API calls to the backend
+//import axios from 'axios' // Import Axios for API calls to the backend
 import { Box, Button, Typography, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Link } from '@mui/material'; // Import necessary Material-UI components
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for routing
 import logo from './TailorBook.png'; // Import logo image
+
+async function postData(url = "", data = {}) {
+  const response = await fetch(url, {
+    method: "POST",
+    mode: "cors",
+    cache: "no-cache",
+    credentials: "same-origin",
+    headers: { "Content-Type": "application/json" },
+    redirect: "follow",
+    referrerPolicy: "no-referrer",
+    body: JSON.stringify(data),
+  });
+  return response.json();
+}
 
 const LandingPage = () => {
   // State to manage dialog visibility and user type (customer or owner)
@@ -28,9 +42,12 @@ const LandingPage = () => {
   const handleLogin = () => {
     console.log('Email:', email); // Log email for debugging
     console.log('Password:', password); // Log password for debugging
+    const data = { email: email, password: password, type: (isCustomer? 'customer' : 'owner')}
+    postData("http://localhost:8080/login", data)
     setEmail(''); // Reset email state
     setPassword(''); // Reset password state
     handleClose(); // Close the login dialog
+
 
     // Navigate to the respective home page based on user type
     // NEED TO UPDATE WITH ACTUAL LOGINS BUT GOES TO CORRECT SIDE BASED ON CUSTOMER OR OWNER
