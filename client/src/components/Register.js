@@ -1,20 +1,40 @@
 import React, { useState } from 'react';
 import { Box, TextField, Button, Typography } from '@mui/material';
 
+async function postData(url = "", data = {}) {
+  const response = await fetch(url, {
+    method: "POST",
+    mode: "cors",
+    cache: "no-cache",
+    credentials: "same-origin",
+    headers: { "Content-Type": "application/json" },
+    redirect: "follow",
+    referrerPolicy: "no-referrer",
+    body: JSON.stringify(data),
+  });
+  return response.json();
+}
+
+
+
 const Register = () => {
   // State to handle form input
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   // Function to handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Name:', name);
-    console.log('Email:', email);
-    console.log('Password:', password);
+    //console.log('Name:', name);
+    //console.log('Email:', email);
+    //console.log('Password:', password);
+    const data = {firstName: firstName, lastName: lastName, email: email, password: password}
+    postData("http://localhost:8080/register", data);
     // Reset form fields
-    setName('');
+    setFirstName('');
+    setLastName('');
     setEmail('');
     setPassword('');
   };
@@ -39,12 +59,20 @@ const Register = () => {
       {/* Form starts here */}
       <form onSubmit={handleSubmit}>
         <TextField
-          label="Full Name"
+          label="First Name"
           variant="outlined"
           fullWidth
           margin="normal"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+        />
+        <TextField
+        label="Last Name"
+        variant="outlined"
+        fullWidth
+        margin="normal"
+        value={lastName}
+        onChange={(e) => setLastName(e.target.value)}
         />
         <TextField
           label="Email"

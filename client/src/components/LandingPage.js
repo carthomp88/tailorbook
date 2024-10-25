@@ -40,8 +40,8 @@ const LandingPage = () => {
 
   // Function to handle login action
   const handleLogin = () => {
-    console.log('Email:', email); // Log email for debugging
-    console.log('Password:', password); // Log password for debugging
+    //console.log('Email:', email); // Log email for debugging
+    //console.log('Password:', password); // Log password for debugging
     const data = { email: email, password: password, type: (isCustomer? 'customer' : 'owner')}
     postData("http://localhost:8080/login", data)
     setEmail(''); // Reset email state

@@ -29,7 +29,7 @@ const OwnerCalendar = () => {
   const appointments = []
   appointmentData.forEach((obj) => {
     const date = new Date(obj.date)
-    appointments.push({title: "" + obj.type + "  for " + (obj.user ? obj.user.name : "anon"), start: new Date(date), end: new Date(moment(date).add(1, 'hours')) })
+    appointments.push({title: "" + obj.type + "  for " + (obj.user ? obj.user.firstName : "anon"), start: new Date(date), end: new Date(moment(date).add(1, 'hours')) })
   })
   const [events] = useState(appointments);
 

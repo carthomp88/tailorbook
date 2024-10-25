@@ -31,7 +31,6 @@ router.get('/', (req, res) => {
 })
 
 router.post('/login', (req, res) => {
-    console.log('trying to send login to me!')
     console.log(req.body.email)
     const email = req.body.email
     const password = req.body.password
@@ -47,24 +46,49 @@ router.post('/login', (req, res) => {
     * 
     * WHAT DO YOU DO TO SAVE LOGGED IN STATE?
     */
-    const caseNum = User.findOne({email: email}).then(user => handleLogin(user, email, password, type))
+    const caseNum = {num: -1}
+    User.findOne({email: email}).then(user => caseNum.num = handleLogin(user, email, password, type))
     const caseMsg = {msg: ""}
     switch (caseNum) {
         case 0:
             caseMsg.msg = "Email not registered"
+            console.log(caseMsg.msg)
             break;
         case 1:
             caseMsg.msg = "Email not registered as " + type
+            console.log(caseMsg.msg)
             break;
         case 2:
             caseMsg.msg = "Success"
+            console.log(caseMsg.msg)
             break;
         case 3:
             caseMsg.msg = "Incorrect password"
+            console.log(caseMsg.msg)
             break;
+        default:
+            console.log("hurr durr")
+            console.log(caseNum)
     }
     console.log(caseMsg.msg)
     res.send(JSON.stringify(caseMsg));
+})
+
+router.post('/register', (req, res) => {
+    const user = new User({
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        email: req.body.email,
+        phonenum: req.body.phonenum
+    })
+
+    User.findOne({email: user.email})
+    .then(userQuery => userQuery ? 
+        console.log('Email already in use case') : 
+        () => {
+            console.log('Email is unregistered case')
+            user.save()
+        })
 })
 
 /* 
