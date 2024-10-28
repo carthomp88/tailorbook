@@ -1,6 +1,6 @@
 import React, { useState } from 'react'; // Import React and useState for managing component state
 //import axios from 'axios' // Import Axios for API calls to the backend
-import { Box, Button, Typography, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Link } from '@mui/material'; // Import necessary Material-UI components
+import { Box, Button, Typography, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Link, DialogContentText } from '@mui/material'; // Import necessary Material-UI components
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for routing
 import logo from './TailorBook.png'; // Import logo image
 
@@ -15,15 +15,70 @@ async function postData(url = "", data = {}) {
     referrerPolicy: "no-referrer",
     body: JSON.stringify(data),
   });
-  return response.json();
+  return await response.json();
 }
 
 const LandingPage = () => {
   // State to manage dialog visibility and user type (customer or owner)
   const [open, setOpen] = useState(false); 
   const [isCustomer, setIsCustomer] = useState(true); // Track whether the modal is for customer or owner
-  const [email, setEmail] = useState(''); // State to manage email input NEED TO ADD DATABASE
-  const [password, setPassword] = useState(''); // State to manage password input NEED TO ADD DATABASE
+  const [email, setEmail] = useState(''); // State to manage email input
+  const [password, setPassword] = useState(''); // State to manage password input
+  const [alertmsg, setAlert] = useState('')
+
+  // Case manager for the user object returned from the DB
+// Pre: A user object, or an empty object
+// Post:  Handles the login result in the dialog box.
+//        Sets useful alert text if something goes wrong, too.
+const loginCase = (user) => {
+  let caseNum = -1
+  const userType = isCustomer ? 'Customer' : 'Owner'
+  if (!user) {
+      caseNum =  0
+  }
+  else if (user.type !== userType && user.type !== 'Both') {
+      caseNum = 1
+  }
+  else {
+      if (password === user.password) {
+          caseNum = 2
+      }
+      else {
+          caseNum = 3
+      }
+  }
+
+  const caseMsg = {msg: ""}
+  switch (caseNum) {
+    case 0:
+        caseMsg.msg = "Email not registered"
+        //console.log(caseMsg.msg)
+        setAlert(caseMsg.msg)
+        break;
+    case 1:
+        caseMsg.msg = "Email not registered as " + (isCustomer ? 'customer' : 'owner')
+        //console.log(caseMsg.msg)
+        setAlert(caseMsg.msg)
+        break;
+    case 2:
+        caseMsg.msg = "Success"
+        //console.log(caseMsg.msg)
+        if (isCustomer) {
+          navigate('/customer/home'); // Navigate to Customer Home
+        } else {
+          navigate('/owner/home'); // Navigate to Owner Home
+        }
+        break;
+    case 3:
+        caseMsg.msg = "Incorrect password"
+        //console.log(caseMsg.msg)
+        setAlert(caseMsg.msg)
+        break;
+    default:
+        console.log("hurr durr")
+  }
+  //console.log('caseNum is ' + caseNum)
+}
 
   const navigate = useNavigate(); // Initialize useNavigate for navigation for non links
 
@@ -36,26 +91,20 @@ const LandingPage = () => {
   // Function to close the login dialog
   const handleClose = () => {
     setOpen(false); // Set open to false to close the dialog
+    setAlert('')
   };
 
   // Function to handle login action
   const handleLogin = () => {
-    console.log('Email:', email); // Log email for debugging
-    console.log('Password:', password); // Log password for debugging
-    const data = { email: email, password: password, type: (isCustomer? 'customer' : 'owner')}
+    //console.log('Email:', email); // Log email for debugging
+    //console.log('Password:', password); // Log password for debugging
+    const data = { email: email } //, password: password, type: (isCustomer? 'customer' : 'owner')}
     postData("http://localhost:8080/login", data)
+    .then(user => console.log(loginCase(user)))
+    .catch(err => console.log(err))
     setEmail(''); // Reset email state
     setPassword(''); // Reset password state
-    handleClose(); // Close the login dialog
-
-
-    // Navigate to the respective home page based on user type
-    // NEED TO UPDATE WITH ACTUAL LOGINS BUT GOES TO CORRECT SIDE BASED ON CUSTOMER OR OWNER
-    if (isCustomer) {
-      navigate('/customer/home'); // Navigate to Customer Home
-    } else {
-      navigate('/owner/home'); // Navigate to Owner Home
-    }
+    //handleClose(); // Close the login dialog
   };
 
   return (
@@ -123,6 +172,9 @@ const LandingPage = () => {
       <Dialog open={open} onClose={handleClose}> 
         <DialogTitle>{isCustomer ? 'Customer Login' : 'Owner Login'}</DialogTitle> {/* Title changes based on user type */}
         <DialogContent>
+          <DialogContentText>
+            {alertmsg}
+          </DialogContentText>
           <TextField
             autoFocus // Automatically focus on this field when dialog opens
             margin="dense" // Set margin to dense for compact spacing
