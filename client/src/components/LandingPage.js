@@ -27,57 +27,57 @@ const LandingPage = () => {
   const [alertmsg, setAlert] = useState('')
 
   // Case manager for the user object returned from the DB
-// Pre: A user object, or an empty object
-// Post:  Handles the login result in the dialog box.
-//        Sets useful alert text if something goes wrong, too.
-const loginCase = (user) => {
-  let caseNum = -1
-  const userType = isCustomer ? 'Customer' : 'Owner'
-  if (!user) {
-      caseNum =  0
-  }
-  else if (user.type !== userType && user.type !== 'Both') {
-      caseNum = 1
-  }
-  else {
-      if (password === user.password) {
-          caseNum = 2
-      }
-      else {
-          caseNum = 3
-      }
-  }
-
-  const caseMsg = {msg: ""}
-  switch (caseNum) {
-    case 0:
-        caseMsg.msg = "Email not registered"
-        //console.log(caseMsg.msg)
-        setAlert(caseMsg.msg)
-        break;
-    case 1:
-        caseMsg.msg = "Email not registered as " + (isCustomer ? 'customer' : 'owner')
-        //console.log(caseMsg.msg)
-        setAlert(caseMsg.msg)
-        break;
-    case 2:
-        caseMsg.msg = "Success"
-        //console.log(caseMsg.msg)
-        if (isCustomer) {
-          navigate('/customer/home'); // Navigate to Customer Home
-        } else {
-          navigate('/owner/home'); // Navigate to Owner Home
+  // Pre: A user object, or an empty object
+  // Post:  Handles the login result in the dialog box.
+  //        Sets useful alert text if something goes wrong, too.
+  const loginCase = (user) => {
+    let caseNum = -1
+    const userType = isCustomer ? 'Customer' : 'Owner'
+    if (!user) {
+        caseNum =  0
+    }
+    else if (user.type !== userType && user.type !== 'Both') {
+        caseNum = 1
+    }
+    else {
+        if (password === user.password) {
+            caseNum = 2
         }
-        break;
-    case 3:
-        caseMsg.msg = "Incorrect password"
-        //console.log(caseMsg.msg)
-        setAlert(caseMsg.msg)
-        break;
-    default:
-        console.log("hurr durr")
-  }
-  //console.log('caseNum is ' + caseNum)
+        else {
+            caseNum = 3
+        }
+    }
+
+    const caseMsg = {msg: ""}
+    switch (caseNum) {
+      case 0:
+          caseMsg.msg = "Email not registered"
+          //console.log(caseMsg.msg)
+          setAlert(caseMsg.msg)
+          break;
+      case 1:
+          caseMsg.msg = "Email not registered as " + (isCustomer ? 'customer' : 'owner')
+          //console.log(caseMsg.msg)
+          setAlert(caseMsg.msg)
+          break;
+      case 2:
+          caseMsg.msg = "Success"
+          //console.log(caseMsg.msg)
+          if (isCustomer) {
+            navigate('/customer/home'); // Navigate to Customer Home
+          } else {
+            navigate('/owner/home'); // Navigate to Owner Home
+          }
+          break;
+      case 3:
+          caseMsg.msg = "Incorrect password"
+          //console.log(caseMsg.msg)
+          setAlert(caseMsg.msg)
+          break;
+      default:
+          console.log("hurr durr")
+    }
+    //console.log('caseNum is ' + caseNum)
 }
 
   const navigate = useNavigate(); // Initialize useNavigate for navigation for non links
@@ -100,7 +100,7 @@ const loginCase = (user) => {
     //console.log('Password:', password); // Log password for debugging
     const data = { email: email } //, password: password, type: (isCustomer? 'customer' : 'owner')}
     postData("http://localhost:8080/login", data)
-    .then(user => console.log(loginCase(user)))
+    .then(user => loginCase(user))
     .catch(err => console.log(err))
     setEmail(''); // Reset email state
     setPassword(''); // Reset password state
