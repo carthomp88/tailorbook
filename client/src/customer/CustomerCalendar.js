@@ -9,7 +9,8 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import axios from 'axios';
 
 // Grab calendar data way up here
-const res = await axios.get('http://localhost:8080/customer/calendar');
+const calendarData = await axios.get('http://localhost:8080/customer/calendar');
+const hours = await axios.get('http://localhost:8080/hours')
 
 async function postData(url = "", data = {}) {
   const response = await fetch(url, {
@@ -67,7 +68,7 @@ const CustomerCalendar = () => {
 
   const appointments = [];
 
-  const appointmentData = res.data.array
+  const appointmentData = calendarData.data.array
 
   sampleAppointments.forEach(aptmt => {
     const date = new Date(aptmt.date);
@@ -97,6 +98,8 @@ const CustomerCalendar = () => {
   const handleServiceChange = (event) => {
     setSelectedService(event.target.value); // Update selected service.
   };
+
+  // PARSE OPEN AND CLOSE HOURS HERE! SOMEHOW! DO IT!
 
   const handleFormSend = () => {
     const data = {

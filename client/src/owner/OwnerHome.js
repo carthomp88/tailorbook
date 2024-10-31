@@ -1,11 +1,46 @@
 import React, { useState } from 'react';
-import { AppBar, Box, IconButton, Menu, MenuItem, TextField, Toolbar, Typography } from '@mui/material';
+import { AppBar, Box, Button, IconButton, Menu, MenuItem, TextField, Toolbar, Typography } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material'; // Import hamburger menu icon
 import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
+import axios from 'axios'
+
+// AXIOS CALLS TO POPULATE WITH EXISTING LANDING INFO
+const landing = await axios.get('http://localhost:8080/landing')
+const hours = await axios.get('http://localhost:8080/hours')
+const days = await axios.get('http://localhost:8080/days')
+
+async function postData(url = "", data = {}) {
+  const response = await fetch(url, {
+    method: "POST",
+    mode: "cors",
+    cache: "no-cache",
+    credentials: "same-origin",
+    headers: { "Content-Type": "application/json" },
+    redirect: "follow",
+    referrerPolicy: "no-referrer",
+    body: JSON.stringify(data),
+  });
+  return await response.json();
+}
 
 const OwnerHome = () => {
+  const [name, setName] = useState(landing.data.name)
+  const [info, setInfo] = useState(landing.data.info)
+  const [email, setEmail] = useState(landing.data.email)
+  const [phone, setPhone] = useState(landing.data.phone)
+  const [socials, setSocials] = useState(landing.data.social)
+  const [alertmsg, setAlert] = useState('')
+
   const navigate = useNavigate(); // Initialize useNavigate
   const [anchorEl, setAnchorEl] = useState(null); // State to manage menu anchor
+
+  const handleSave = () => {
+    console.log('saving')
+    const data = {name: name, info: info, email: email, phone: phone, social: socials}
+    postData('http://localhost:8080/landing', data)
+    .then(setAlert('Changes saved successfully!'))
+    .catch(err => console.log(err))
+  }
 
   // Handle menu open
   const handleMenuOpen = (event) => {
@@ -68,9 +103,36 @@ const OwnerHome = () => {
           borderRadius: '10px', // Rounded corners
           padding: '20px',
         }}>
-          <TextField variant="outlined" placeholder="Edit Business Name" sx={{ width: '80%', backgroundColor: '#f5f5f5' }} />
-          <TextField variant="outlined" placeholder="Edit Business Info" sx={{ width: '80%', backgroundColor: '#f5f5f5' }} />
-          <TextField variant="outlined" placeholder="Edit Business Hours" sx={{ width: '80%', backgroundColor: '#f5f5f5' }} />
+          <Typography variant="p">{alertmsg}</Typography>
+          <TextField 
+            variant="outlined" 
+            placeholder="Edit Business Name" 
+            sx={{ width: '80%', backgroundColor: '#f5f5f5' }} 
+            value={name} // Controlled component for email input
+            onChange={(e) => setName(e.target.value)} // Update email state on change
+          />
+          <TextField 
+            variant="outlined" 
+            placeholder="Edit Business Info" 
+            sx={{ width: '80%', backgroundColor: '#f5f5f5' }}  
+            value={info} // Controlled component for email input
+            onChange={(e) => setInfo(e.target.value)} // Update email state on change
+          />
+          <TextField 
+            variant="outlined" 
+            placeholder="Edit Business Hours" 
+            sx={{ width: '80%', backgroundColor: '#f5f5f5' }}  // Controlled component for email input
+          />
+          <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          fullWidth
+          sx={{ marginTop: '20px' }}
+          onClick={handleSave}
+        >
+          Save Changes
+      </Button>
         </Box>
 
         {/* Right box for pictures */}
@@ -89,6 +151,8 @@ const OwnerHome = () => {
         </Box>
       </Box>
 
+      
+
       {/* Fixed bottom bar for contact information */}
       <Box sx={{
         backgroundColor: '#ffffff',
@@ -101,9 +165,27 @@ const OwnerHome = () => {
         bottom: '0', // Stick to the bottom
         boxShadow: '0 -4px 10px rgba(0, 0, 0, 0.1)', // Subtle shadow at the bottom
       }}>
-        <TextField variant="outlined" placeholder="Insert Email" sx={{ width: '30%', backgroundColor: '#f5f5f5' }} />
-        <TextField variant="outlined" placeholder="Insert Phone Number" sx={{ width: '30%', backgroundColor: '#f5f5f5' }} />
-        <TextField variant="outlined" placeholder="Insert Social Media" sx={{ width: '30%', backgroundColor: '#f5f5f5' }} />
+        <TextField 
+          variant="outlined" 
+          placeholder="Insert Email" 
+          sx={{ width: '30%', backgroundColor: '#f5f5f5' }}  
+          value={email} // Controlled component for email input
+          onChange={(e) => setEmail(e.target.value)} // Update email state on change
+        />
+        <TextField 
+          variant="outlined" 
+          placeholder="Insert Phone Number" 
+          sx={{ width: '30%', backgroundColor: '#f5f5f5' }}  
+          value={phone} // Controlled component for email input
+          onChange={(e) => setPhone(e.target.value)} // Update email state on change
+        />
+        <TextField 
+          variant="outlined" 
+          placeholder="Insert Social Media" 
+          sx={{ width: '30%', backgroundColor: '#f5f5f5' }}  
+          value={socials} // Controlled component for email input
+          onChange={(e) => setSocials(e.target.value)} // Update email state on change
+        />
       </Box>
 
       {/* Hamburger menu for navigation */}
