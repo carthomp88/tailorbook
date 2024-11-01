@@ -10,7 +10,9 @@ import CustomerHome from './customer/CustomerHome';
 import OwnerCalendar from './owner/OwnerCalendar';
 import CustomerCalendar from './customer/CustomerCalendar';
 import OwnerServices from './owner/OwnerServices';
-import CustomerServices from './customer/CustomerServices';
+import OwnerSiteSettings from './owner/OwnerSiteSettings';
+import CustomerServices from './owner/OwnerSiteSettings';
+
 
 function App() {
   return (
@@ -24,6 +26,7 @@ function App() {
           <Route path="/owner/calendar" element={<OwnerCalendar />} />
           <Route path="/customer/calendar" element={<CustomerCalendar />} />
           <Route path="/owner/services" element={<OwnerServices />} />
+          <Route path="/owner/site-settings" element={<OwnerSiteSettings />} />
           <Route path="/customer/services" element={<CustomerServices />} />
         </Routes>
       </div>

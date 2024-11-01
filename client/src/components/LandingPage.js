@@ -1,16 +1,16 @@
-import React, { useState } from 'react'; // Import React and useState for managing component state
-import { Box, Button, Typography, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Link } from '@mui/material'; // Import necessary Material-UI components
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for routing
+import React, { useState } from 'react';
+import { Box, Button, Typography, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Link } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import logo from './TailorBook.png'; // Import logo image
 
 const LandingPage = () => {
   // State to manage dialog visibility and user type (customer or owner)
-  const [open, setOpen] = useState(false); 
+  const [open, setOpen] = useState(false);
   const [isCustomer, setIsCustomer] = useState(true); // Track whether the modal is for customer or owner
-  const [email, setEmail] = useState(''); // State to manage email input NEED TO ADD DATABASE
-  const [password, setPassword] = useState(''); // State to manage password input NEED TO ADD DATABASE
+  const [email, setEmail] = useState(''); // State to manage email input
+  const [password, setPassword] = useState(''); // State to manage password input
 
-  const navigate = useNavigate(); // Initialize useNavigate for navigation for non links
+  const navigate = useNavigate(); // Initialize useNavigate for navigation
 
   // Function to open the dialog and set the user type
   const handleClickOpen = (userType) => {
@@ -25,14 +25,11 @@ const LandingPage = () => {
 
   // Function to handle login action
   const handleLogin = () => {
-    console.log('Email:', email); // Log email for debugging
-    console.log('Password:', password); // Log password for debugging
     setEmail(''); // Reset email state
     setPassword(''); // Reset password state
     handleClose(); // Close the login dialog
 
     // Navigate to the respective home page based on user type
-    // NEED TO UPDATE WITH ACTUAL LOGINS BUT GOES TO CORRECT SIDE BASED ON CUSTOMER OR OWNER
     if (isCustomer) {
       navigate('/customer/home'); // Navigate to Customer Home
     } else {
@@ -43,66 +40,105 @@ const LandingPage = () => {
   return (
     <Box
       sx={{
-        position: 'relative', // Set position relative for the Box
         height: '100vh', // Full viewport height
-        backgroundColor: 'white', // Black background color
+        display: 'flex', // Flexbox layout
+        flexDirection: 'column', // Stack header and content vertically
+        justifyContent: 'center', // Center content vertically
+        alignItems: 'center', // Center content horizontally
+        backgroundColor: 'white', // White background color
         overflow: 'hidden', // Hide overflow content
-        margin: 0, // Remove any margin
-        padding: 0, // Remove any padding
       }}
     >
-        <Box
-    component="img" // Set the component type to img
-    src={logo} // Set the source of the image to the logo
-    alt="Logo" // Alt text for the logo
-    sx={{
-      width: '50%', // Adjust width to 50% of the viewport width
-      maxWidth: '700px', // Set a maximum width for the logo
-      position: 'absolute', // Position the logo absolutely
-      top: '60%', // Center the logo vertically
-      left: '50%', // Center the logo horizontally
-      transform: 'translate(-50%, -50%)', // Adjust position to truly center both vertically and horizontally
-    }}
-  />
-      <Typography
-        variant="h2" // Set typography variant to h2
-        sx={{
-          position: 'absolute', // Position text absolutely
-          top: '40px', // Position text 40px from the top
-          left: '50%', // Center the text horizontally
-          transform: 'translateX(-50%)', // Adjust position to truly center the text
-          color: 'black', // Set text color to white
-        }}
-      >
-        Welcome to TailorBook
-      </Typography>
+      {/* Fixed Header at the top */}
       <Box
         sx={{
-          position: 'absolute', // Position buttons absolutely
-          top: '200px', // Position buttons 200px from the top
-          left: '50%', // Center buttons horizontally
-          transform: 'translateX(-50%)', // Adjust position to truly center the buttons
+          position: 'fixed', // Keeps the header fixed at the top
+          top: 0, // Positions it at the very top
+          width: '100%', // Full width across the viewport
+          height: '80px', // Set a fixed height for the header
+          backgroundColor: 'white', // White background
+          display: 'flex', // Flexbox layout for header
+          justifyContent: 'center', // Center text horizontally
+          alignItems: 'center', // Center text vertically
+          boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)', // Subtle shadow for header
+          zIndex: 1000, // Ensure header stays on top of other content
         }}
       >
-        <Button
-          variant="contained" // Set button variant to contained
-          color="primary" // Set primary color for the button
-          sx={{ marginRight: '10px' }} // Add margin to the right of the button
-          onClick={() => handleClickOpen('customer')} // Open login dialog for customer
+        {/* Header Text */}
+        <Typography
+          variant="h4" // Set typography variant to h4
+          sx={{
+            color: 'black', // Set text color to black
+            textAlign: 'center', // Center the text
+          }}
         >
-          Customer
-        </Button>
-        <Button
-          variant="contained" // Set button variant to contained
-          color="secondary" // Set secondary color for the button
-          onClick={() => handleClickOpen('owner')} // Open login dialog for owner
-        >
-          Owner
-        </Button>
+          Welcome to TailorBook
+        </Typography>
       </Box>
 
-      {/* Login dialog for user authentication */}
-      <Dialog open={open} onClose={handleClose}> 
+      {/* Main Content - Logo and Buttons in the Middle */}
+      <Box
+        sx={{
+          display: 'flex', // Flexbox layout
+          flexDirection: 'column', // Stack logo and buttons vertically
+          justifyContent: 'center', // Center content vertically within the remaining space
+          alignItems: 'center', // Center content horizontally
+          flexGrow: 1, // Take up the remaining height below the fixed header
+          paddingTop: '100px', // Padding to adjust for the fixed header height
+        }}
+      >
+        {/* Logo */}
+        <Box
+          component="img" // Render as an image element
+          src={logo} // Set the source to the imported logo
+          alt="Logo" // Alt text for the logo
+          sx={{
+            width: { xs: '80%', sm: '50%' }, // Responsive width: 80% on mobile, 50% on larger screens
+            maxWidth: '900px', // Set a maximum width for the logo
+            marginBottom: '20px', // Margin below the logo
+          }}
+        />
+
+        {/* Buttons */}
+        <Box
+          sx={{
+            display: 'flex', // Flexbox for buttons
+            justifyContent: 'center', // Center buttons horizontally
+            alignItems: 'center', // Align buttons vertically
+            gap: 2, // Spacing between the buttons
+            marginTop: '20px', // Margin above the buttons
+          }}
+        >
+          {/* Customer Button */}
+          <Button
+            variant="contained" // Contained button style
+            color="primary" // Primary color for the button
+            sx={{
+              width: { xs: '120px', sm: '160px' }, // Responsive width: 120px on mobile, 160px on larger screens
+              height: '50px', // Fixed height for the buttons
+            }}
+            onClick={() => handleClickOpen('customer')} // Open login dialog for customer
+          >
+            Customer
+          </Button>
+
+          {/* Owner Button */}
+          <Button
+            variant="contained" // Contained button style
+            color="secondary" // Secondary color for the button
+            sx={{
+              width: { xs: '120px', sm: '160px' }, // Responsive width: 120px on mobile, 160px on larger screens
+              height: '50px', // Fixed height for the buttons
+            }}
+            onClick={() => handleClickOpen('owner')} // Open login dialog for owner
+          >
+            Owner
+          </Button>
+        </Box>
+      </Box>
+
+      {/* Login Dialog */}
+      <Dialog open={open} onClose={handleClose}>
         <DialogTitle>{isCustomer ? 'Customer Login' : 'Owner Login'}</DialogTitle> {/* Title changes based on user type */}
         <DialogContent>
           <TextField
@@ -138,4 +174,4 @@ const LandingPage = () => {
   );
 };
 
-export default LandingPage; // Export LandingPage component for use in other files
+export default LandingPage;
