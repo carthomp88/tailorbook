@@ -4,6 +4,8 @@ if (process.env.NODE_ENV !== 'production') {
 
 const cors = require('cors')
 
+const bcrypt = require('bcrypt')
+
 const express = require('express')
 const app = express()
 

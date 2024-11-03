@@ -1,21 +1,7 @@
 import React, { useState } from 'react';
 import { Box, TextField, Button, Typography } from '@mui/material';
 
-async function postData(url = "", data = {}) {
-  const response = await fetch(url, {
-    method: "POST",
-    mode: "cors",
-    cache: "no-cache",
-    credentials: "same-origin",
-    headers: { "Content-Type": "application/json" },
-    redirect: "follow",
-    referrerPolicy: "no-referrer",
-    body: JSON.stringify(data),
-  });
-  return await response.json();
-}
-
-
+import postData from './functions.js'
 
 const Register = () => {
   // State to handle form input
@@ -32,7 +18,7 @@ const Register = () => {
     postData("http://localhost:8080/register", data)
     // If the email is found, an empty object is returned from the backend. If the email is not found, the new user's data is sent back
     // to be used later.
-    .then(user => {console.log(user); user.email !== undefined ? setAlert("Successfully registered!") : setAlert("Email already in use!")})
+    .then(user => user.email !== undefined ? setAlert("Successfully registered!") : setAlert("Email already in use!"))
     .catch(err => console.log(err));
     // Reset form fields
     setFirstName('');
