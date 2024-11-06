@@ -1,192 +1,100 @@
 import React, { useState } from 'react';
-import { AppBar, Box, Button, IconButton, Menu, MenuItem, TextField, Toolbar, Typography } from '@mui/material';
+import { AppBar, Box, IconButton, Menu, MenuItem, Toolbar, Typography, List, ListItem, ListItemText } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material'; // Import hamburger menu icon
-import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
-import axios from 'axios'
-import postData from '../components/functions.js'
+import { useNavigate } from 'react-router-dom';
+import { Calendar, momentLocalizer } from 'react-big-calendar';
+import moment from 'moment';
+import 'react-big-calendar/lib/css/react-big-calendar.css'; // Import calendar CSS
 
-// AXIOS CALLS TO POPULATE WITH EXISTING LANDING INFO
-const landing = await axios.get('http://localhost:8080/landing')
-const hours = await axios.get('http://localhost:8080/hours')
-const days = await axios.get('http://localhost:8080/days')
+const localizer = momentLocalizer(moment);
 
 const OwnerHome = () => {
-  const [name, setName] = useState(landing.data.name)
-  const [info, setInfo] = useState(landing.data.info)
-  const [email, setEmail] = useState(landing.data.email)
-  const [phone, setPhone] = useState(landing.data.phone)
-  const [socials, setSocials] = useState(landing.data.social)
-  const [alertmsg, setAlert] = useState('')
+  const navigate = useNavigate();
+  const [anchorEl, setAnchorEl] = useState(null); // State for managing hamburger menu visibility
+  const [selectedDate, setSelectedDate] = useState(moment().toDate()); // Default to today's date
 
-  const navigate = useNavigate(); // Initialize useNavigate
-  const [anchorEl, setAnchorEl] = useState(null); // State to manage menu anchor
+  // Example appointment data (replace with actual data source)
+  const appointments = [
+    { date: '2024-10-31', time: '10:00 AM', client: 'John Doe' },
+    { date: '2024-10-31', time: '12:00 PM', client: 'Jane Smith' },
+    { date: '2024-11-01', time: '2:00 PM', client: 'Mark Johnson' },
+  ];
 
-  const handleSave = () => {
-    console.log('saving')
-    const data = {name: name, info: info, email: email, phone: phone, social: socials}
-    postData('http://localhost:8080/landing', data)
-    .then(setAlert('Changes saved successfully!'))
-    .catch(err => console.log(err))
-  }
+  // Filter appointments to only show those for the selected date
+  const filteredAppointments = appointments.filter(appointment =>
+    moment(appointment.date).isSame(selectedDate, 'day')
+  );
 
-  // Handle menu open
-  const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget); // Set the anchor element for the menu
-  };
+  // Open and close hamburger menu
+  const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
+  const handleMenuClose = () => setAnchorEl(null);
 
-  // Handle menu close
-  const handleMenuClose = () => {
-    setAnchorEl(null); // Clear the anchor element to close the menu
-  };
-
-  // Define a function to handle navigation
-  const handleNavigation = (path) => {
-    navigate(path); // Navigate to the specified path
-    handleMenuClose(); // Close the menu after navigation
+  // Handle date selection on the calendar
+  const handleDateSelect = (date) => {
+    setSelectedDate(date); // Set selected date for viewing appointments
   };
 
   return (
-    <Box sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh', paddingBottom: '100px' }}> {/* Light background with space for the footer */}
-      {/* AppBar with a modern white background and subtle shadow */}
+    <Box sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh', paddingBottom: '100px' }}>
+      {/* AppBar with Logo and Title */}
       <AppBar position="static" sx={{ backgroundColor: '#ffffff', boxShadow: 'none', borderBottom: '1px solid #e0e0e0' }}>
         <Toolbar>
+          {/* Business Logo */}
+          <Box component="img" src="/path/to/logo.png" alt="Business Logo" sx={{ height: '50px', marginRight: '20px' }} />
           <Typography variant="h4" sx={{ flexGrow: 1, textAlign: 'center', color: '#000000', fontWeight: 'bold' }}>
-            Owner Home
+            Owner Dashboard
           </Typography>
           <IconButton edge="end" color="inherit" aria-label="menu" onClick={handleMenuOpen}>
-            <MenuIcon sx={{ color: '#000000' }} /> {/* Modern black hamburger menu icon */}
+            <MenuIcon sx={{ color: '#000000' }} />
           </IconButton>
         </Toolbar>
       </AppBar>
 
-      {/* Main container for layout */}
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: '20px' }}>
-        {/* Left box for pictures */}
-        <Box sx={{
-          backgroundColor: '#ffffff',
-          width: '200px', // Smaller width for a cleaner look
-          height: '300px', // Smaller height
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          margin: '30px', // Reduced margin for smaller spacing
-          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)', // Subtle shadow for modern effect
-          borderRadius: '10px', // Rounded corners
-        }}>
-          <TextField variant="outlined" placeholder="Insert Picture" sx={{ width: '80%', backgroundColor: '#f5f5f5' }} /> {/* Lighter background */}
+      {/* Main Layout with Calendar and Today's Appointments */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px' }}>
+        {/* Calendar Component */}
+        <Box sx={{ width: '80%', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)', marginBottom: '20px', borderRadius: '10px', overflow: 'hidden' }}>
+          <Calendar
+            localizer={localizer}
+            events={[]} // Add real events data here if available
+            startAccessor="start"
+            endAccessor="end"
+            style={{ height: 400 }}
+            selectable
+            onSelectSlot={(slotInfo) => handleDateSelect(slotInfo.start)}
+          />
         </Box>
 
-        {/* Middle large vertical rectangle for editable business info */}
-        <Box sx={{
-          backgroundColor: '#ffffff',
-          width: '300px', // Reduced width for a modern look
-          height: '300px', // Reduced height
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'space-around',
-          margin: '30px', // Reduced margin
-          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)', // Subtle shadow for modern effect
-          borderRadius: '10px', // Rounded corners
-          padding: '20px',
-        }}>
-          <Typography variant="p">{alertmsg}</Typography>
-          <TextField 
-            variant="outlined" 
-            placeholder="Edit Business Name" 
-            sx={{ width: '80%', backgroundColor: '#f5f5f5' }} 
-            value={name} // Controlled component for email input
-            onChange={(e) => setName(e.target.value)} // Update email state on change
-          />
-          <TextField 
-            variant="outlined" 
-            placeholder="Edit Business Info" 
-            sx={{ width: '80%', backgroundColor: '#f5f5f5' }}  
-            value={info} // Controlled component for email input
-            onChange={(e) => setInfo(e.target.value)} // Update email state on change
-          />
-          <TextField 
-            variant="outlined" 
-            placeholder="Edit Business Hours" 
-            sx={{ width: '80%', backgroundColor: '#f5f5f5' }}  // Controlled component for email input
-          />
-          <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          fullWidth
-          sx={{ marginTop: '20px' }}
-          onClick={handleSave}
-        >
-          Save Changes
-      </Button>
-        </Box>
-
-        {/* Right box for pictures */}
-        <Box sx={{
-          backgroundColor: '#ffffff',
-          width: '200px', // Smaller width for a cleaner look
-          height: '300px', // Smaller height
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          margin: '30px', // Reduced margin
-          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)', // Subtle shadow for modern effect
-          borderRadius: '10px', // Rounded corners
-        }}>
-          <TextField variant="outlined" placeholder="Insert Picture" sx={{ width: '80%', backgroundColor: '#f5f5f5' }} /> {/* Lighter background */}
+        {/* Today's Appointments List */}
+        <Box sx={{ width: '80%', backgroundColor: '#ffffff', borderRadius: '10px', padding: '20px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)' }}>
+          <Typography variant="h5" sx={{ marginBottom: '10px' }}>Appointments for {moment(selectedDate).format('MMMM Do YYYY')}</Typography>
+          <List>
+            {filteredAppointments.length > 0 ? (
+              filteredAppointments.map((appointment, index) => (
+                <ListItem key={index} sx={{ borderBottom: '1px solid #e0e0e0' }}>
+                  <ListItemText
+                    primary={`${appointment.time} - ${appointment.client}`}
+                    secondary="Appointment details here"
+                  />
+                </ListItem>
+              ))
+            ) : (
+              <Typography variant="body1" color="textSecondary">No appointments for this date.</Typography>
+            )}
+          </List>
         </Box>
       </Box>
 
-      
-
-      {/* Fixed bottom bar for contact information */}
-      <Box sx={{
-        backgroundColor: '#ffffff',
-        width: '100%',
-        height: '100px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-around',
-        position: 'fixed', // Fixed position at the bottom
-        bottom: '0', // Stick to the bottom
-        boxShadow: '0 -4px 10px rgba(0, 0, 0, 0.1)', // Subtle shadow at the bottom
-      }}>
-        <TextField 
-          variant="outlined" 
-          placeholder="Insert Email" 
-          sx={{ width: '30%', backgroundColor: '#f5f5f5' }}  
-          value={email} // Controlled component for email input
-          onChange={(e) => setEmail(e.target.value)} // Update email state on change
-        />
-        <TextField 
-          variant="outlined" 
-          placeholder="Insert Phone Number" 
-          sx={{ width: '30%', backgroundColor: '#f5f5f5' }}  
-          value={phone} // Controlled component for email input
-          onChange={(e) => setPhone(e.target.value)} // Update email state on change
-        />
-        <TextField 
-          variant="outlined" 
-          placeholder="Insert Social Media" 
-          sx={{ width: '30%', backgroundColor: '#f5f5f5' }}  
-          value={socials} // Controlled component for email input
-          onChange={(e) => setSocials(e.target.value)} // Update email state on change
-        />
-      </Box>
-
-      {/* Hamburger menu for navigation */}
-      <Menu
-        anchorEl={anchorEl} // Anchor element for the menu
-        open={Boolean(anchorEl)} // Open state of the menu
-        onClose={handleMenuClose} // Close the menu
-      >
-        <MenuItem onClick={() => handleNavigation('/owner/calendar')}>Owner Calendar</MenuItem> {/* Navigate to Owner Calendar */}
-        <MenuItem onClick={() => handleNavigation('/owner/services')}>Owner Services</MenuItem> {/* Navigate to Owner Services */}
-        <MenuItem onClick={handleMenuClose}>Close</MenuItem> {/* Close the menu */}
+      {/* Hamburger Menu */}
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+        <MenuItem onClick={() => navigate('/owner/home')}>Dashboard</MenuItem>
+        <MenuItem onClick={() => navigate('/owner/services')}>Manage Services</MenuItem>
+        <MenuItem onClick={() => navigate('/owner/calendar')}>View Calendar</MenuItem>
+        <MenuItem onClick={() => navigate('/owner/site-settings')}>Site Settings</MenuItem>
+        <MenuItem onClick={handleMenuClose}>Close</MenuItem>
       </Menu>
     </Box>
   );
 };
 
-export default OwnerHome; // Export the component for use in other files
+export default OwnerHome;
