@@ -5,6 +5,10 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate from react
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment'; // Import moment for date handling
 import 'react-big-calendar/lib/css/react-big-calendar.css'; // Import calendar styles
+import axios from 'axios'
+
+// Get calendar data from db
+const res = await axios.get('http://localhost:8080/owner/calendar')
 
 // Initialize the localizer with the moment adapter for date management
 const localizer = momentLocalizer(moment);
@@ -19,15 +23,15 @@ const OwnerCalendar = () => {
     handleMenuClose(); // Close the menu after navigation
   };
 
-  // State to hold events for the calendar
-  const [events] = useState([
-    // Example events (replace with your actual events)
-    {
-      title: 'Sample Event', // Title of the event
-      start: new Date(), // Start date of the event
-      end: new Date(moment().add(1, 'hours')), // End date of the event
-    },
-  ]);
+  // Populate events with calendar data from server
+  const appointmentData = res.data.array
+  
+  const appointments = []
+  appointmentData.forEach((obj) => {
+    const date = new Date(obj.date)
+    appointments.push({title: "" + obj.type + "  for " + (obj.user ? obj.user.firstName : "anon"), start: new Date(date), end: new Date(moment(date).add(1, 'hours')) })
+  })
+  const [events] = useState(appointments);
 
   // Handle menu open
   const handleMenuOpen = (event) => {

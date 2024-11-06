@@ -1,20 +1,28 @@
 import React, { useState } from 'react';
 import { Box, TextField, Button, Typography } from '@mui/material';
 
+import postData from './functions.js'
+
 const Register = () => {
   // State to handle form input
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [alertmsg, setAlert] = useState('');
 
   // Function to handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Name:', name);
-    console.log('Email:', email);
-    console.log('Password:', password);
+    const data = {firstName: firstName, lastName: lastName, email: email, password: password, type: 'Customer'}
+    postData("http://localhost:8080/register", data)
+    // If the email is found, an empty object is returned from the backend. If the email is not found, the new user's data is sent back
+    // to be used later.
+    .then(user => user.email !== undefined ? setAlert("Successfully registered!") : setAlert("Email already in use!"))
+    .catch(err => console.log(err));
     // Reset form fields
-    setName('');
+    setFirstName('');
+    setLastName('');
     setEmail('');
     setPassword('');
   };
@@ -36,15 +44,25 @@ const Register = () => {
         Register Here
       </Typography>
 
+      <Typography variant="h5">{alertmsg}</Typography>
+
       {/* Form starts here */}
       <form onSubmit={handleSubmit}>
         <TextField
-          label="Full Name"
+          label="First Name"
           variant="outlined"
           fullWidth
           margin="normal"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+        />
+        <TextField
+        label="Last Name"
+        variant="outlined"
+        fullWidth
+        margin="normal"
+        value={lastName}
+        onChange={(e) => setLastName(e.target.value)}
         />
         <TextField
           label="Email"

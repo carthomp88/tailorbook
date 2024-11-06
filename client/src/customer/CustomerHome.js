@@ -4,6 +4,9 @@ import { Menu as MenuIcon } from '@mui/icons-material'; // Import hamburger menu
 import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
 import haircutImage from './haircut.jpg';
 import massageImage from './massage.jpg';
+import axios from 'axios'
+
+const landing = await axios.get('http://localhost:8080/landing')
 
 const images = {
   Haircut: haircutImage,
@@ -11,6 +14,12 @@ const images = {
 };
 
 const CustomerHome = () => {
+  const name = useState(landing.data.name)
+  const info = useState(landing.data.info)
+  const email = useState(landing.data.email)
+  const phone = useState(landing.data.phone)
+  const social = useState(landing.data.social)
+
   const navigate = useNavigate(); // Initialize useNavigate for navigation
   const [anchorEl, setAnchorEl] = useState(null); // State to manage menu anchor
 
@@ -74,9 +83,9 @@ const CustomerHome = () => {
           borderRadius: '10px', // Rounded corners
           padding: '20px', // Padding inside the box
         }}>
-          <Typography variant="h2" sx={{ color: '#000000', fontWeight: 'bold' }}>Gabe's Spa & Salon</Typography>
+          <Typography variant="h2" textAlign="center" sx={{ color: '#000000', fontWeight: 'bold' }}>{name}</Typography>
           <Typography variant="h5" sx={{ color: '#555555' }}>Welcome to Gabe's Spa & Salon!</Typography>
-          <Typography variant="h5" sx={{ color: '#555555' }}>Your oasis for relaxation and beauty</Typography>
+          <Typography variant="h5" sx={{ color: '#555555' }}>{info}</Typography>
           <Typography variant="h5" sx={{ color: '#555555' }}>Hours: M-S: 9-5 | Sundays: Closed</Typography>
         </Box>
 
@@ -109,9 +118,9 @@ const CustomerHome = () => {
         padding: '0 20px', // Add padding to the sides
         boxShadow: '0 -4px 10px rgba(0, 0, 0, 0.1)', // Subtle shadow at the bottom
       }}>
-        <Typography sx={{ color: '#555555', width: '30%', textAlign: 'right' }}>Email: example@business.com</Typography>
-        <Typography sx={{ color: '#555555', width: '30%', textAlign: 'center' }}>Phone Number: (123) 456-7890</Typography>
-        <Typography sx={{ color: '#555555', width: '30%', textAlign: 'left' }}>Social Media: @businessname</Typography>
+        <Typography sx={{ color: '#555555', width: '30%', textAlign: 'right' }}>Email: {email}</Typography>
+        <Typography sx={{ color: '#555555', width: '30%', textAlign: 'center' }}>Phone Number: {phone}</Typography>
+        <Typography sx={{ color: '#555555', width: '30%', textAlign: 'left' }}>Social Media: {social}</Typography>
       </Box>
       {/* Hamburger menu for navigation */}
       <Menu

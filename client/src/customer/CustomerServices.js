@@ -6,6 +6,9 @@ import haircutImage from './haircut.jpg';
 import massageImage from './massage.jpg';
 import manicureImage from './manicure.webp';
 import facialImage from './facial.jpg';
+import axios from 'axios'
+
+const res = await axios.get('http://localhost:8080/customer/services')
 
 const images = {
   Haircut: haircutImage,
@@ -44,6 +47,17 @@ const services = [
     image: images.Facial,
   },
 ];
+
+const serviceData = res.data.array
+serviceData.forEach((obj) => {
+  services.push({
+    name: obj.name, 
+    description: obj.desc, 
+    time: '' + obj.time + ' minutes',
+    price: '$' + obj.price,
+    image: obj.imgURL
+  })
+})
 
 const AvailableServices = () => {
   const navigate = useNavigate();
