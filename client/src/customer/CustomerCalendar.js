@@ -7,24 +7,11 @@ import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import axios from 'axios';
+import postData from '../components/functions.js'
 
 // Grab calendar data way up here
 const calendarData = await axios.get('http://localhost:8080/customer/calendar');
 const hours = await axios.get('http://localhost:8080/hours')
-
-async function postData(url = "", data = {}) {
-  const response = await fetch(url, {
-    method: "POST",
-    mode: "cors",
-    cache: "no-cache",
-    credentials: "same-origin",
-    headers: { "Content-Type": "application/json" },
-    redirect: "follow",
-    referrerPolicy: "no-referrer",
-    body: JSON.stringify(data),
-  });
-  return response.json();
-}
 
 // Create a localizer for the calendar using moment.js, which will handle date parsing and formatting.
 const localizer = momentLocalizer(moment);

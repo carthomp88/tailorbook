@@ -1,4 +1,5 @@
 const express = require('express')
+const bcrypt = require('bcrypt')
 const router = express.Router()
 const User = require('../models/User')
 const Landing = require('../models/LandingPage')
@@ -14,13 +15,25 @@ router.post('/login', (req, res) => {
     User.findOne({email: email}).then(user => res.send(JSON.stringify(user)))
 })
 
+router.post('/check', (req, res) => {
+    const password = req.body.password
+    const hash = req.body.hash
+    bcrypt.compare(password, hash, (err, result) => {
+        if (err) {console.log(err); return;}
+        else if (result) res.send('1')
+        else res.send('0')
+    })
+})
+
 router.post('/register', (req, res) => {
+    console.log('hellooooo??????//')
+    // salt and hash the password
     const user = new User({
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         email: req.body.email,
-        phonenum: req.body.phonenum,
-        password: req.body.password
+        type: req.body.type,
+        password: ''
     })
 
     User.findOne({email: user.email}) //userQ is the query result. if it is null that means the email was not found meaning add it
@@ -28,6 +41,14 @@ router.post('/register', (req, res) => {
         if (userQ) {res.send({})} // if user found return null
         else { // else save the user with this data and send the user object back to the frontend
             user.save()
+            bcrypt.genSalt(10, (err, salt) => {
+                if (err) {console.log(err); return;}
+                bcrypt.hash(req.body.password, salt, (err, hash) => {
+                    if (err) {console.log(err); return;}
+                    console.log(hash)
+                    User.updateOne({email: user.email}, {$set: {password: hash}}).then(console.log('done'))
+                })
+            })
             res.send(JSON.stringify(user))
         }
     })

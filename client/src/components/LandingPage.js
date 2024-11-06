@@ -18,6 +18,11 @@ async function postData(url = "", data = {}) {
   return await response.json();
 }
 
+async function confirmMatch(data) {
+  const check = await postData('http://localhost:8080/check', data)
+  return await check
+}
+
 const LandingPage = () => {
   // State to manage dialog visibility and user type (customer or owner)
   const [open, setOpen] = useState(false); 
@@ -31,54 +36,67 @@ const LandingPage = () => {
   // Post:  Handles the login result in the dialog box.
   //        Sets useful alert text if something goes wrong, too.
   const loginCase = (user) => {
-    let caseNum = -1
-    const userType = isCustomer ? 'Customer' : 'Owner'
-    if (!user) {
-        caseNum =  0
-    }
-    else if (user.type !== userType && user.type !== 'Both') {
-        caseNum = 1
-    }
-    else {
-        if (password === user.password) {
-            caseNum = 2
-        }
-        else {
-            caseNum = 3
-        }
+    const userCases = async (val, user) => {
+      console.log('in usercases')
+      if (!user) {
+        return 3
+      }
+      else if (user.type !== userType && user.type !== 'Both') {
+        return 2
+      }
+      if (val !== -1) return val
+      else return -1
     }
 
-    const caseMsg = {msg: ""}
-    switch (caseNum) {
-      case 0:
-          caseMsg.msg = "Email not registered"
-          //console.log(caseMsg.msg)
-          setAlert(caseMsg.msg)
-          break;
-      case 1:
-          caseMsg.msg = "Email not registered as " + (isCustomer ? 'customer' : 'owner')
-          //console.log(caseMsg.msg)
-          setAlert(caseMsg.msg)
-          break;
-      case 2:
-          caseMsg.msg = "Success"
-          //console.log(caseMsg.msg)
-          if (isCustomer) {
-            navigate('/customer/home'); // Navigate to Customer Home
-          } else {
-            navigate('/owner/home'); // Navigate to Owner Home
-          }
-          break;
-      case 3:
-          caseMsg.msg = "Incorrect password"
-          //console.log(caseMsg.msg)
-          setAlert(caseMsg.msg)
-          break;
-      default:
-          console.log("hurr durr")
+    const userType = isCustomer ? 'Customer' : 'Owner'
+    
+    const resolveCase = async (caseNum) => {
+      switch (caseNum) {
+        case 3:
+            caseMsg.msg = "Email not registered"
+            //console.log(caseMsg.msg)
+            setAlert(caseMsg.msg)
+            break;
+        case 2:
+            caseMsg.msg = "Email not registered as " + (isCustomer ? 'customer' : 'owner')
+            //console.log(caseMsg.msg)
+            setAlert(caseMsg.msg)
+            break;
+        case 1:
+            caseMsg.msg = "Success"
+            //console.log(caseMsg.msg)
+            if (isCustomer) {
+              navigate('/customer/home'); // Navigate to Customer Home
+            } else {
+              navigate('/owner/home'); // Navigate to Owner Home
+            }
+            break;
+        case 0:
+            caseMsg.msg = "Incorrect password"
+            //console.log(caseMsg.msg)
+            setAlert(caseMsg.msg)
+            break;
+        default:
+            console.log("hurr durr")
+      }
     }
-    //console.log('caseNum is ' + caseNum)
-}
+    const caseMsg = {msg: ""}
+    // if there is a password, compare
+    if (user.password !== undefined) {
+      const data = {password: password, hash: user.password}
+      confirmMatch(data)
+      .then(val => {
+          if (val === 1) {return 1} 
+          else return 0
+      })
+      .then(val => userCases(val, user))
+      //.then(caseNum => passwordCases(caseNum))
+      .then(caseNum => resolveCase(caseNum))
+      //console.log('caseNum is ' + caseNum)}
+    } else {
+      resolveCase(3);
+    }
+  }
 
   const navigate = useNavigate(); // Initialize useNavigate for navigation for non links
 
@@ -100,7 +118,7 @@ const LandingPage = () => {
     //console.log('Password:', password); // Log password for debugging
     const data = { email: email } //, password: password, type: (isCustomer? 'customer' : 'owner')}
     postData("http://localhost:8080/login", data)
-    .then(user => loginCase(user))
+    .then(user => loginCase(user ? user : {}))
     .catch(err => console.log(err))
     setEmail(''); // Reset email state
     setPassword(''); // Reset password state

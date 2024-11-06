@@ -3,25 +3,12 @@ import { AppBar, Box, Button, IconButton, Menu, MenuItem, TextField, Toolbar, Ty
 import { Menu as MenuIcon } from '@mui/icons-material'; // Import hamburger menu icon
 import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
 import axios from 'axios'
+import postData from '../components/functions.js'
 
 // AXIOS CALLS TO POPULATE WITH EXISTING LANDING INFO
 const landing = await axios.get('http://localhost:8080/landing')
 const hours = await axios.get('http://localhost:8080/hours')
 const days = await axios.get('http://localhost:8080/days')
-
-async function postData(url = "", data = {}) {
-  const response = await fetch(url, {
-    method: "POST",
-    mode: "cors",
-    cache: "no-cache",
-    credentials: "same-origin",
-    headers: { "Content-Type": "application/json" },
-    redirect: "follow",
-    referrerPolicy: "no-referrer",
-    body: JSON.stringify(data),
-  });
-  return await response.json();
-}
 
 const OwnerHome = () => {
   const [name, setName] = useState(landing.data.name)
