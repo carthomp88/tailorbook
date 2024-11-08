@@ -22,7 +22,9 @@ const CustomerCalendar = () => {
 
   const [anchorEl, setAnchorEl] = useState(null); // State variable to manage the anchor element for the dropdown menu.
   const [selectedService, setSelectedService] = useState(''); // State variable to store the selected service from the dropdown.
-  const [selectedDate, setSelectedDate] = useState(null); // State variable to store the selected date from the calendar.
+  const [selectedDate, setSelectedDate] = useState(moment().format('YYYY-MM-DD')); // State variable to store the selected date from the calendar.
+  const [selectedDOW, setDOW] = useState(moment().day())
+  const [selectedLongDate, setLongDate] = useState(moment().format('MMMM Do YYYY'))
   const [selectedTime, setSelectedTime] = useState(''); // State variable to store the selected time for the appointment.
   const [showCheckoutPopup, setShowCheckoutPopup] = useState(false); // State to manage checkout popup visibility.
 
@@ -34,14 +36,17 @@ const CustomerCalendar = () => {
   const [cardNumber, setCardNumber] = useState('');
   const [cardExpiration, setCardExpiration] = useState('');
   const [cardCVC, setCardCVC] = useState('');
+  const [notes, setNotes] = useState('');
 
   // Object defining available services based on specific dates.
   const serviceAvailability = {
-    '2024-11-30': ['Haircut', 'Massage', 'Facial'],
-    '2024-11-29': ['Haircut', 'Manicure'],
-    '2024-11-11': ['Pedicure', 'Massage', 'Facial'],
-    '2024-11-12': ['Facial', 'Pedicure', 'Manicure'],
-    '2024-11-13': ['Haircut', 'Massage'],
+    1: ['Haircut', 'Massage', 'Facial'],
+    2: ['Haircut', 'Manicure'],
+    3: ['Pedicure', 'Massage', 'Facial'],
+    4: ['Facial', 'Pedicure', 'Manicure'],
+    5: ['Haircut', 'Massage'],
+    6: ['Haircut', 'Massage', 'Facial', 'Manicure', 'Pedicure'],
+    0: []
   };
 
   // Sample appointment data for testing unavailable slots next week
@@ -73,14 +78,17 @@ const CustomerCalendar = () => {
   // Handle date selection on the calendar.
   const handleDateSelect = (slotInfo) => {
     const selectedDate = moment(slotInfo.start).format('YYYY-MM-DD'); // Format the selected date.
+    const dayOfWeek = moment(slotInfo.start).day()
+    const longDate = moment(slotInfo.start).format('MMMM Do YYYY')
     setSelectedDate(selectedDate); // Update the state with the selected date.
+    setDOW(dayOfWeek)
+    setLongDate(longDate)
     setSelectedService(''); // Reset selected service when the date changes.
     setSelectedTime(''); // Reset selected time when the date changes.
   };
 
   // Get available services for the selected date.
-  const availableServices = selectedDate && serviceAvailability[selectedDate] ? serviceAvailability[selectedDate] : [];
-
+  const availableServices = selectedDOW && serviceAvailability[selectedDOW] ? serviceAvailability[selectedDOW] : [];
   // Handle service selection in the dropdown.
   const handleServiceChange = (event) => {
     setSelectedService(event.target.value); // Update selected service.
@@ -95,7 +103,8 @@ const CustomerCalendar = () => {
       lastName: customerLastName,
       email: customerEmail,
       phonenum: customerPhone,
-      type: selectedService
+      type: selectedService,
+      notes: notes
     }
     postData("http://localhost:8080/customer/book", data)
     handleCheckoutClose()
@@ -159,7 +168,7 @@ const CustomerCalendar = () => {
 
       {/* Instructional message */}
       <Box sx={{ backgroundColor: 'white', color: 'black', padding: '10px', textAlign: 'center', marginTop: '10px' }}>
-        Select a date to see available services
+        Selected: {selectedLongDate}
       </Box>
 
       {/* Layout container with calendar on the left and service dropdown on the right */}
@@ -339,9 +348,17 @@ const CustomerCalendar = () => {
             fullWidth
             margin="normal"
           />
+          <TextField
+            label="Additional Notes"
+            value={notes}
+            onChange={e => setNotes(e.target.value)}
+            variant="outlined"
+            fullWidth
+            margin="normal"
+          />
 
           <Typography variant="h6" sx={{ marginBottom: '20px', marginTop: '20px' }}>
-            Thank you for your booking!
+            Thank you for booking!
           </Typography>
           <Button variant="contained" onClick={handleFormSend}>
             Submit and Book

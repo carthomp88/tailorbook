@@ -31,7 +31,8 @@ router.post('/book', (req, res) => {
     const aptmt = new Appointment({ 
         date: req.body.date,
         type: req.body.type,
-        user: user
+        user: user,
+        notes: req.body.notes
     })
     user.save()
     aptmt.save()

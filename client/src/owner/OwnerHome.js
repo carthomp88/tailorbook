@@ -4,9 +4,12 @@ import { Menu as MenuIcon } from '@mui/icons-material'; // Import hamburger menu
 import { useNavigate } from 'react-router-dom';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
+import axios from 'axios'
 import 'react-big-calendar/lib/css/react-big-calendar.css'; // Import calendar CSS
 
 const localizer = momentLocalizer(moment);
+
+const res = await axios.get('http://localhost:8080/owner/calendar')
 
 const OwnerHome = () => {
   const navigate = useNavigate();
@@ -14,11 +17,24 @@ const OwnerHome = () => {
   const [selectedDate, setSelectedDate] = useState(moment().toDate()); // Default to today's date
 
   // Example appointment data (replace with actual data source)
-  const appointments = [
-    { date: '2024-10-31', time: '10:00 AM', client: 'John Doe' },
-    { date: '2024-10-31', time: '12:00 PM', client: 'Jane Smith' },
-    { date: '2024-11-01', time: '2:00 PM', client: 'Mark Johnson' },
-  ];
+  const appointments = [];
+
+  const appointmentData = res.data.array
+
+  appointmentData.forEach((obj) => {
+    const date = new Date(obj.date)
+    appointments.push({
+      date: date.toLocaleDateString(),
+      time: date.toLocaleTimeString(), 
+      client: obj.user.firstName + ' ' + obj.user.lastName, 
+      start: new Date(date), 
+      end: new Date(moment(date).add(1, 'hours')),
+      notes: obj.notes === undefined ? 'No notes provided' : obj.notes,
+      type: obj.type
+    })
+  })
+
+  const [events] = useState(appointments)
 
   // Filter appointments to only show those for the selected date
   const filteredAppointments = appointments.filter(appointment =>
@@ -56,7 +72,7 @@ const OwnerHome = () => {
         <Box sx={{ width: '80%', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)', marginBottom: '20px', borderRadius: '10px', overflow: 'hidden' }}>
           <Calendar
             localizer={localizer}
-            events={[]} // Add real events data here if available
+            events={[events]} // Add real events data here if available
             startAccessor="start"
             endAccessor="end"
             style={{ height: 400 }}
@@ -74,7 +90,7 @@ const OwnerHome = () => {
                 <ListItem key={index} sx={{ borderBottom: '1px solid #e0e0e0' }}>
                   <ListItemText
                     primary={`${appointment.time} - ${appointment.client}`}
-                    secondary="Appointment details here"
+                    secondary={`${appointment.type}: ${appointment.notes}`}
                   />
                 </ListItem>
               ))
