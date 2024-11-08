@@ -87,7 +87,6 @@ const OwnerHome = () => {
 
       {/* Hamburger Menu */}
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-        <MenuItem onClick={() => navigate('/owner/home')}>Dashboard</MenuItem>
         <MenuItem onClick={() => navigate('/owner/services')}>Manage Services</MenuItem>
         <MenuItem onClick={() => navigate('/owner/calendar')}>View Calendar</MenuItem>
         <MenuItem onClick={() => navigate('/owner/site-settings')}>Site Settings</MenuItem>

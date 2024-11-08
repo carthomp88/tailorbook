@@ -10,7 +10,7 @@ import OwnerCalendar from './owner/OwnerCalendar';
 import CustomerCalendar from './customer/CustomerCalendar';
 import OwnerServices from './owner/OwnerServices';
 import OwnerSiteSettings from './owner/OwnerSiteSettings';
-import CustomerServices from './owner/OwnerSiteSettings';
+import CustomerServices from './customer/CustomerServices';
 
 
 function App() {

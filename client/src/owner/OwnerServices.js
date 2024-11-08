@@ -117,7 +117,7 @@ const OwnerServices = () => {
       >
         <MenuItem onClick={() => handleNavigation('/owner/home')}>Owner Home</MenuItem> {/* Navigate to Owner Home */}
         <MenuItem onClick={() => handleNavigation('/owner/calendar')}>Owner Calendar</MenuItem> {/* Navigate to Owner Calendar */}
-        <MenuItem onClick={() => handleNavigation('/owner/services')}>Owner Services</MenuItem> {/* Navigate to Owner Services */}
+        <MenuItem onClick={() => navigate('/owner/site-settings')}>Site Settings</MenuItem>
         <MenuItem onClick={handleMenuClose}>Close</MenuItem> {/* Close the menu */}
       </Menu>
 

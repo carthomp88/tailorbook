@@ -37,20 +37,20 @@ const CustomerCalendar = () => {
 
   // Object defining available services based on specific dates.
   const serviceAvailability = {
-    '2024-10-30': ['Haircut', 'Massage', 'Facial'],
-    '2024-10-31': ['Haircut', 'Manicure'],
-    '2024-11-01': ['Pedicure', 'Massage', 'Facial'],
-    '2024-11-02': ['Facial', 'Pedicure', 'Manicure'],
-    '2024-11-03': ['Haircut', 'Massage'],
+    '2024-11-30': ['Haircut', 'Massage', 'Facial'],
+    '2024-11-29': ['Haircut', 'Manicure'],
+    '2024-11-11': ['Pedicure', 'Massage', 'Facial'],
+    '2024-11-12': ['Facial', 'Pedicure', 'Manicure'],
+    '2024-11-13': ['Haircut', 'Massage'],
   };
 
   // Sample appointment data for testing unavailable slots next week
   const sampleAppointments = [
-    { date: '2024-10-30T10:00:00' }, // October 30th, 10 AM
-    { date: '2024-10-31T13:00:00' }, // October 31st, 1 PM
-    { date: '2024-11-01T09:00:00' }, // November 1st, 9 AM
-    { date: '2024-11-02T14:00:00' }, // November 2nd, 2 PM
-    { date: '2024-11-03T16:00:00' }, // November 3rd, 4 PM
+    { date: '2024-11-30T10:00:00' }, // November 30th, 10 AM
+    { date: '2024-11-29T13:00:00' }, // November 29th, 1 PM
+    { date: '2024-11-11T09:00:00' }, // November 11th, 9 AM
+    { date: '2024-11-12T14:00:00' }, // November 12th, 2 PM
+    { date: '2024-11-13T16:00:00' }, // November 13th, 4 PM
   ];
 
   const appointments = [];
@@ -358,7 +358,7 @@ const CustomerCalendar = () => {
         open={Boolean(anchorEl)} // Open state of the menu
         onClose={handleMenuClose} // Close the menu
       >
-        <MenuItem onClick={() => handleNavigation('/customer/home')}>Customer Calendar</MenuItem> {/* Navigate to Customer Calendar */}
+        <MenuItem onClick={() => handleNavigation('/customer/home')}>Customer Home</MenuItem> {/* Navigate to Customer Calendar */}
         <MenuItem onClick={() => handleNavigation('/customer/services')}>Available Services</MenuItem> {/* Navigate to Available Services */}
         <MenuItem onClick={handleMenuClose}>Close</MenuItem> {/* Close the menu */}
       </Menu>
