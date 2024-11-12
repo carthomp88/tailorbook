@@ -187,6 +187,7 @@ const OwnerSiteSettings = () => {
         <Button variant="contained" color="primary" onClick={handleSave}>
           Save
         </Button>
+      </Box>
 
       {/* Hours Section */}
       <Box sx={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 2 }}>
