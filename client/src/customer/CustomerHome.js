@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AppBar, Box, IconButton, Menu, MenuItem, Toolbar, Typography } from '@mui/material';
+import { AppBar, Box, IconButton, List, ListItem, ListItemText, Menu, MenuItem, Toolbar, Typography } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material'; // Import hamburger menu icon
 import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
 import haircutImage from './haircut.jpg';
@@ -13,6 +13,8 @@ const images = {
   Massage: massageImage,
 };
 
+const hours = landing.data.hours
+
 const CustomerHome = () => {
   const name = useState(landing.data.name)
   const info = useState(landing.data.info)
@@ -22,6 +24,19 @@ const CustomerHome = () => {
 
   const navigate = useNavigate(); // Initialize useNavigate for navigation
   const [anchorEl, setAnchorEl] = useState(null); // State to manage menu anchor
+
+  
+  const [displayHours] = useState([
+    hours.sunday.name + ': ' + (hours.sunday.open === 'Closed'?'Closed':(hours.sunday.open + '-' + hours.sunday.close)),
+    hours.monday.name + ': ' + (hours.monday.open === 'Closed'?'Closed':(hours.monday.open +  '-' + hours.monday.close)),
+    hours.tuesday.name + ': ' + (hours.tuesday.open === 'Closed'?'Closed':(hours.tuesday.open +  '-' + hours.tuesday.close)),
+    hours.wednesday.name + ': ' + (hours.wednesday.open === 'Closed'?'Closed':(hours.wednesday.open +  '-' + hours.wednesday.close)),
+    hours.thursday.name + ': ' + (hours.thursday.open === 'Closed'?'Closed':(hours.thursday.open +  '-' + hours.thursday.close)),
+    hours.friday.name + ': ' + (hours.friday.open === 'Closed'?'Closed':(hours.friday.open +  '-' + hours.friday.close)),
+    hours.saturday.name + ': ' + (hours.saturday.open === 'Closed'?'Closed':(hours.saturday.open +  '-' + hours.saturday.close)),
+  ])
+  const hoursObj = {hours: ''}
+  displayHours.forEach((day) => hoursObj.hours += day)
 
   // Handle menu open
   const handleMenuOpen = (event) => {
@@ -84,9 +99,16 @@ const CustomerHome = () => {
           padding: '20px', // Padding inside the box
         }}>
           <Typography variant="h2" textAlign="center" sx={{ color: '#000000', fontWeight: 'bold' }}>{name}</Typography>
-          <Typography variant="h5" sx={{ color: '#555555' }}>Welcome to Gabe's Spa & Salon!</Typography>
+          <Typography variant="h5" sx={{ color: '#555555' }}>Welcome to {name}!</Typography>
           <Typography variant="h5" sx={{ color: '#555555' }}>{info}</Typography>
-          <Typography variant="h5" sx={{ color: '#555555' }}>Hours: M-S: 9-5 | Sundays: Closed</Typography>
+          <Typography variant="h5" sx={{ color: '#555555' }}>Hours:</Typography>
+          <List>
+            {displayHours.map((day, index) => (
+              <ListItem key={index}>
+                <ListItemText secondary={`${day}`}></ListItemText>
+              </ListItem>
+            ))}
+          </List>
         </Box>
 
         {/* Right vertical rectangle for pictures */}
