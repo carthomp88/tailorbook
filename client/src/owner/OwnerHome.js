@@ -29,7 +29,7 @@ const OwnerHome = () => {
       client: obj.user.firstName + ' ' + obj.user.lastName, 
       start: new Date(date), 
       end: new Date(moment(date).add(1, 'hours')),
-      notes: obj.notes === undefined ? 'No notes provided' : obj.notes,
+      notes: (obj.notes === '') || (obj.notes === undefined) ? 'No notes provided' : obj.notes,
       type: obj.type
     })
   })

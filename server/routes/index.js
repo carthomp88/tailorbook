@@ -65,7 +65,8 @@ router.post('/landing', (req, res) => {
             info: req.body.info,
             email: req.body.email,
             phone: req.body.phone,
-            social: req.body.social
+            social: req.body.social,
+            hours: req.body.hours
         }}).then()
 })
 

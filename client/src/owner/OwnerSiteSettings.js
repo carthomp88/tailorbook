@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import { AppBar, Box, IconButton, TextField, Toolbar, Typography, Menu, MenuItem, Button } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios'
+import postData from '../components/functions.js'
+
+const res = await axios.get('http://localhost:8080/landing')
 
 const OwnerSiteSettings = () => {
   const navigate = useNavigate();
@@ -10,18 +14,50 @@ const OwnerSiteSettings = () => {
   const [anchorEl, setAnchorEl] = useState(null);
 
   // State variables for business information
-  const [businessName, setBusinessName] = useState('Gabe’s Spa & Salon');
-  const [businessInfo, setBusinessInfo] = useState('Your oasis for relaxation and beauty');
-  const [businessHours, setBusinessHours] = useState('M-S: 9-5 | Sundays: Closed');
+  const hours = res.data.hours
+  //const days = [hours.sunday, hours.monday, hours.tuesday, hours.wednesday, hours.thursday, hours.friday, hours.saturday]
+  const [businessName, setBusinessName] = useState(res.data.name);
+  const [businessInfo, setBusinessInfo] = useState(res.data.info);
+  const [displayHours] = useState([
+    hours.sunday.name + ': ' + (hours.sunday.open === 'Closed'?'Closed':(hours.sunday.open + '-' + hours.sunday.close)) + '\n',
+    hours.monday.name + ': ' + (hours.monday.open === 'Closed'?'Closed':(hours.monday.open +  '-' + hours.monday.close)) + '\n',
+    hours.tuesday.name + ': ' + (hours.tuesday.open === 'Closed'?'Closed':(hours.tuesday.open +  '-' + hours.tuesday.close)) + '\n',
+    hours.wednesday.name + ': ' + (hours.wednesday.open === 'Closed'?'Closed':(hours.wednesday.open +  '-' + hours.wednesday.close)) + '\n',
+    hours.thursday.name + ': ' + (hours.thursday.open === 'Closed'?'Closed':(hours.thursday.open +  '-' + hours.thursday.close)) + '\n',
+    hours.friday.name + ': ' + (hours.friday.open === 'Closed'?'Closed':(hours.friday.open +  '-' + hours.friday.close)) + '\n',
+    hours.saturday.name + ': ' + (hours.saturday.open === 'Closed'?'Closed':(hours.saturday.open +  '-' + hours.saturday.close)) + '\n',
+  ])
+  const hoursObj = {hours: ''}
+  displayHours.forEach((day) => hoursObj.hours += day)
+  const [sundayOpen, updateSunOpen] = useState(hours.sunday.open)
+  const [sundayClose, updateSunClose] = useState(hours.sunday.close)
+  const [mondayOpen, updateMonOpen] = useState(hours.monday.open)
+  const [mondayClose, updateMonClose] = useState(hours.monday.close)
+  const [tuesdayOpen, updateTuesOpen] = useState(hours.tuesday.open)
+  const [tuesdayClose, updateTuesClose] = useState(hours.tuesday.close)
+  const [wednesdayOpen, updateWedOpen] = useState(hours.wednesday.open)
+  const [wednesdayClose, updateWedClose] = useState(hours.wednesday.close)
+  const [thursdayOpen, updateThursOpen] = useState(hours.thursday.open)
+  const [thursdayClose, updateThursClose] = useState(hours.thursday.close)
+  const [fridayOpen, updateFriOpen] = useState(hours.friday.open)
+  const [fridayClose, updateFriClose] = useState(hours.friday.close)
+  const [saturdayOpen, updateSatOpen] = useState(hours.saturday.open)
+  const [saturdayClose, updateSatClose] = useState(hours.saturday.close)
+
+
+  const [businessHours, setBusinessHours] = useState('Hours: M-S: 9-5 | Sundays: Closed');
 
   // State variables for contact information
-  const [contactEmail, setContactEmail] = useState('example@business.com');
-  const [contactPhone, setContactPhone] = useState('(123) 456-7890');
-  const [contactSocial, setContactSocial] = useState('@businessname');
+  const [contactEmail, setContactEmail] = useState(res.data.email);
+  const [contactPhone, setContactPhone] = useState(res.data.phone);
+  const [contactSocial, setContactSocial] = useState(res.data.social);
 
   // State for image uploads
   const [logo, setLogo] = useState(null); // Stores uploaded logo image
   const [serviceImages, setServiceImages] = useState([null, null, null]); // Stores uploaded service images
+
+  // State for successful save alert
+  const [alertMsg, setAlert] = useState('')
 
   // Handle the menu open and close
   const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
@@ -42,6 +78,55 @@ const OwnerSiteSettings = () => {
       setServiceImages(newImages);
     }
   };
+
+  const handleSave = () => {
+    const data = {
+      name: businessName,
+      info: businessInfo,
+      email: contactEmail,
+      phone: contactPhone,
+      social: contactSocial,
+      hours: {
+        sunday: {
+          name: 'Sunday',
+          open: sundayOpen,
+          close: sundayClose
+        },
+        monday: {
+          name: 'Monday',
+          open: mondayOpen,
+          close: mondayClose
+        },
+        tuesday: {
+          name: 'Tuesday',
+          open: tuesdayOpen,
+          close: tuesdayClose
+        },
+        wednesday: {
+          name: 'Wednesday',
+          open: wednesdayOpen,
+          close: wednesdayClose
+        },
+        thursday: {
+          name: 'Thursday',
+          open: thursdayOpen,
+          close: thursdayClose
+        },
+        friday: {
+          name: 'Friday',
+          open: fridayOpen,
+          close: fridayClose
+        },
+        saturday: {
+          name: 'Saturday',
+          open: saturdayOpen,
+          close: saturdayClose
+        }
+      }
+    }
+    postData('http://localhost:8080/landing', data)
+    setAlert('Saved')
+  }
 
   return (
     <Box sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh', paddingBottom: '100px' }}>
@@ -138,6 +223,140 @@ const OwnerSiteSettings = () => {
         </Box>
       </Box>
 
+      {/* Hours Section */}
+      <Box sx={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Typography variant="h5" sx={{ marginBottom: '10px' }}>Hours</Typography>
+        <Typography variant="h6" sx={{ marginBottom: '10px' }}>(Use format HH:MM AM (or PM) or type Closed)</Typography>
+        <Box sx={{ display: 'flex', gap: 3 }}>
+          {/* Loop through each day and customize hours */}
+            <Box sx={{
+              width: '300px', height: '200px', backgroundColor: '#ffffff', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+              borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative'
+            }}>
+              <Box sx={{padding: '10px', display: 'flex', flexDirection: 'column', gap: 2}}>
+              <Typography>Sunday</Typography>
+              <TextField
+                value={sundayOpen}
+                onChange={(e) => updateSunOpen(e.target.value)}
+              />
+              <TextField
+                value={sundayClose}
+                onChange={(e) => updateSunClose(e.target.value)}
+              />
+              </Box>
+            </Box>
+            <Box sx={{
+              width: '300px', height: '200px', backgroundColor: '#ffffff', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+              borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative'
+            }}>
+              <Box sx={{padding: '10px', display: 'flex', flexDirection: 'column', gap: 2}}>
+              <Typography>Monday</Typography>
+              <TextField
+                value={mondayOpen}
+                onChange={(e) => updateMonOpen(e.target.value)}
+              />
+              <TextField
+                value={mondayClose}
+                onChange={(e) => updateMonClose(e.target.value)}
+              />
+              </Box>
+            </Box>
+            <Box sx={{
+              width: '300px', height: '200px', backgroundColor: '#ffffff', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+              borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative'
+            }}>
+              <Box sx={{padding: '10px', display: 'flex', flexDirection: 'column', gap: 2}}>
+              <Typography>Tuesday</Typography>
+              <TextField
+                value={tuesdayOpen}
+                onChange={(e) => updateTuesOpen(e.target.value)}
+              />
+              <TextField
+                value={tuesdayClose}
+                onChange={(e) => updateTuesClose(e.target.value)}
+              />
+              </Box>
+            </Box>
+            <Box sx={{
+              width: '300px', height: '200px', backgroundColor: '#ffffff', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+              borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative'
+            }}>
+              <Box sx={{padding: '10px', display: 'flex', flexDirection: 'column', gap: 2}}>
+              <Typography>Wednesday</Typography>
+              <TextField
+                value={wednesdayOpen}
+                onChange={(e) => updateWedOpen(e.target.value)}
+              />
+              <TextField
+                value={wednesdayClose}
+                onChange={(e) => updateWedClose(e.target.value)}
+              />
+              </Box>
+            </Box>
+            <Box sx={{
+              width: '300px', height: '200px', backgroundColor: '#ffffff', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+              borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative'
+            }}>
+              <Box sx={{padding: '10px', display: 'flex', flexDirection: 'column', gap: 2}}>
+              <Typography>Thursday</Typography>
+              <TextField
+                value={thursdayOpen}
+                onChange={(e) => updateThursOpen(e.target.value)}
+              />
+              <TextField
+                value={thursdayClose}
+                onChange={(e) => updateThursClose(e.target.value)}
+              />
+              </Box>
+            </Box>
+            <Box sx={{
+              width: '300px', height: '200px', backgroundColor: '#ffffff', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+              borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative'
+            }}>
+              <Box sx={{padding: '10px', display: 'flex', flexDirection: 'column', gap: 2}}>
+              <Typography>Friday</Typography>
+              <TextField
+                value={fridayOpen}
+                onChange={(e) => updateFriOpen(e.target.value)}
+              />
+              <TextField
+                value={fridayClose}
+                onChange={(e) => updateFriClose(e.target.value)}
+              />
+              </Box>
+            </Box>
+            <Box sx={{
+              width: '300px', height: '200px', backgroundColor: '#ffffff', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+              borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative'
+            }}>
+              <Box sx={{padding: '10px', display: 'flex', flexDirection: 'column', gap: 2}}>
+              <Typography>Saturday</Typography>
+              <TextField
+                value={saturdayOpen}
+                onChange={(e) => updateSatOpen(e.target.value)}
+              />
+              <TextField
+                value={saturdayClose}
+                onChange={(e) => updateSatClose(e.target.value)}
+              />
+              </Box>
+            </Box>
+        </Box>
+      </Box>
+
+      {/* Single Day Custom Hours Section */}
+      <Box sx={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Typography variant="h5" sx={{ marginBottom: '10px' }}>Add Holiday/Closure/Special Hours</Typography>
+        <Box sx={{ display: 'flex', gap: 3 }}>
+            <Box sx={{
+              width: '300px', height: '200px', backgroundColor: '#ffffff', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+              borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative'
+            }}>
+              <Typography>Coming Soon :)</Typography>
+            </Box>
+        </Box>
+      </Box>
+
       {/* Contact Information Section */}
       <Box sx={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Typography variant="h5" sx={{ marginBottom: '10px' }}>Contact Information</Typography>
@@ -168,6 +387,11 @@ const OwnerSiteSettings = () => {
           variant="outlined"
           sx={{ backgroundColor: '#f5f5f5' }}
         />
+        <Button
+        onClick={handleSave}>
+          Save Changes
+        </Button>
+        <Typography align='center'>{alertMsg}</Typography>
       </Box>
 
       {/* Hamburger Menu */}

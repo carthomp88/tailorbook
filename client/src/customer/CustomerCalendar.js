@@ -11,7 +11,16 @@ import postData from '../components/functions.js'
 
 // Grab calendar data way up here
 const calendarData = await axios.get('http://localhost:8080/customer/calendar');
-const hours = await axios.get('http://localhost:8080/hours')
+const hoursData = await axios.get('http://localhost:8080/landing')
+
+const hours = []
+hours.push(hoursData.data.hours.sunday)
+hours.push(hoursData.data.hours.monday)
+hours.push(hoursData.data.hours.tuesday)
+hours.push(hoursData.data.hours.wednesday)
+hours.push(hoursData.data.hours.thursday)
+hours.push(hoursData.data.hours.friday)
+hours.push(hoursData.data.hours.saturday)
 
 // Create a localizer for the calendar using moment.js, which will handle date parsing and formatting.
 const localizer = momentLocalizer(moment);
@@ -37,6 +46,16 @@ const CustomerCalendar = () => {
   const [cardExpiration, setCardExpiration] = useState('');
   const [cardCVC, setCardCVC] = useState('');
   const [notes, setNotes] = useState('');
+
+  const validSelectedTime = (selectedTime) => {
+    const dayOfWeek = moment(selectedDate).day()
+    if (hours[dayOfWeek].open === 'Closed') return false
+    const selectedMoment = moment(selectedTime, 'h:mm a')
+    const openMoment = moment(hours[dayOfWeek].open, 'h:mm a')
+    const closeMoment = moment(hours[dayOfWeek].close, 'h:mm a')
+    if (selectedMoment.isBefore(openMoment) || selectedMoment.isSameOrAfter(closeMoment)) {return false}
+    return true
+  }
 
   // Object defining available services based on specific dates.
   const serviceAvailability = {
@@ -252,7 +271,7 @@ const CustomerCalendar = () => {
           padding: '30px 43px', // Increase padding
           fontSize: '30px', // Increase font size
         }}
-        disabled={!selectedService || !selectedDate || !selectedTime} // Disable if conditions are not met.
+        disabled={!selectedService || !selectedDate || !selectedTime || !validSelectedTime(selectedTime)} // Disable if conditions are not met.
         onClick={handleBooking} // Handle booking button click.
       >
         Book Appointment
