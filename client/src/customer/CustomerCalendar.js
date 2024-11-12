@@ -11,7 +11,16 @@ import postData from '../components/functions.js'
 
 // Grab calendar data way up here
 const calendarData = await axios.get('http://localhost:8080/customer/calendar');
-const hours = await axios.get('http://localhost:8080/hours')
+const hoursData = await axios.get('http://localhost:8080/landing')
+
+const hours = []
+hours.push(hoursData.data.hours.sunday)
+hours.push(hoursData.data.hours.monday)
+hours.push(hoursData.data.hours.tuesday)
+hours.push(hoursData.data.hours.wednesday)
+hours.push(hoursData.data.hours.thursday)
+hours.push(hoursData.data.hours.friday)
+hours.push(hoursData.data.hours.saturday)
 
 // Create a localizer for the calendar using moment.js, which will handle date parsing and formatting.
 const localizer = momentLocalizer(moment);
@@ -22,7 +31,9 @@ const CustomerCalendar = () => {
 
   const [anchorEl, setAnchorEl] = useState(null); // State variable to manage the anchor element for the dropdown menu.
   const [selectedService, setSelectedService] = useState(''); // State variable to store the selected service from the dropdown.
-  const [selectedDate, setSelectedDate] = useState(null); // State variable to store the selected date from the calendar.
+  const [selectedDate, setSelectedDate] = useState(moment().format('YYYY-MM-DD')); // State variable to store the selected date from the calendar.
+  const [selectedDOW, setDOW] = useState(moment().day())
+  const [selectedLongDate, setLongDate] = useState(moment().format('MMMM Do YYYY'))
   const [selectedTime, setSelectedTime] = useState(''); // State variable to store the selected time for the appointment.
   const [showCheckoutPopup, setShowCheckoutPopup] = useState(false); // State to manage checkout popup visibility.
 
@@ -34,23 +45,36 @@ const CustomerCalendar = () => {
   const [cardNumber, setCardNumber] = useState('');
   const [cardExpiration, setCardExpiration] = useState('');
   const [cardCVC, setCardCVC] = useState('');
+  const [notes, setNotes] = useState('');
+
+  const validSelectedTime = (selectedTime) => {
+    const dayOfWeek = moment(selectedDate).day()
+    if (hours[dayOfWeek].open === 'Closed') return false
+    const selectedMoment = moment(selectedTime, 'h:mm a')
+    const openMoment = moment(hours[dayOfWeek].open, 'h:mm a')
+    const closeMoment = moment(hours[dayOfWeek].close, 'h:mm a')
+    if (selectedMoment.isBefore(openMoment) || selectedMoment.isSameOrAfter(closeMoment)) {return false}
+    return true
+  }
 
   // Object defining available services based on specific dates.
   const serviceAvailability = {
-    '2024-10-30': ['Haircut', 'Massage', 'Facial'],
-    '2024-10-31': ['Haircut', 'Manicure'],
-    '2024-11-01': ['Pedicure', 'Massage', 'Facial'],
-    '2024-11-02': ['Facial', 'Pedicure', 'Manicure'],
-    '2024-11-03': ['Haircut', 'Massage'],
+    1: ['Haircut', 'Massage', 'Facial'],
+    2: ['Haircut', 'Manicure'],
+    3: ['Pedicure', 'Massage', 'Facial'],
+    4: ['Facial', 'Pedicure', 'Manicure'],
+    5: ['Haircut', 'Massage'],
+    6: ['Haircut', 'Massage', 'Facial', 'Manicure', 'Pedicure'],
+    0: []
   };
 
   // Sample appointment data for testing unavailable slots next week
   const sampleAppointments = [
-    { date: '2024-10-30T10:00:00' }, // October 30th, 10 AM
-    { date: '2024-10-31T13:00:00' }, // October 31st, 1 PM
-    { date: '2024-11-01T09:00:00' }, // November 1st, 9 AM
-    { date: '2024-11-02T14:00:00' }, // November 2nd, 2 PM
-    { date: '2024-11-03T16:00:00' }, // November 3rd, 4 PM
+    { date: '2024-11-30T10:00:00' }, // November 30th, 10 AM
+    { date: '2024-11-29T13:00:00' }, // November 29th, 1 PM
+    { date: '2024-11-11T09:00:00' }, // November 11th, 9 AM
+    { date: '2024-11-12T14:00:00' }, // November 12th, 2 PM
+    { date: '2024-11-13T16:00:00' }, // November 13th, 4 PM
   ];
 
   const appointments = [];
@@ -73,14 +97,17 @@ const CustomerCalendar = () => {
   // Handle date selection on the calendar.
   const handleDateSelect = (slotInfo) => {
     const selectedDate = moment(slotInfo.start).format('YYYY-MM-DD'); // Format the selected date.
+    const dayOfWeek = moment(slotInfo.start).day()
+    const longDate = moment(slotInfo.start).format('MMMM Do YYYY')
     setSelectedDate(selectedDate); // Update the state with the selected date.
+    setDOW(dayOfWeek)
+    setLongDate(longDate)
     setSelectedService(''); // Reset selected service when the date changes.
     setSelectedTime(''); // Reset selected time when the date changes.
   };
 
   // Get available services for the selected date.
-  const availableServices = selectedDate && serviceAvailability[selectedDate] ? serviceAvailability[selectedDate] : [];
-
+  const availableServices = selectedDOW && serviceAvailability[selectedDOW] ? serviceAvailability[selectedDOW] : [];
   // Handle service selection in the dropdown.
   const handleServiceChange = (event) => {
     setSelectedService(event.target.value); // Update selected service.
@@ -95,7 +122,8 @@ const CustomerCalendar = () => {
       lastName: customerLastName,
       email: customerEmail,
       phonenum: customerPhone,
-      type: selectedService
+      type: selectedService,
+      notes: notes
     }
     postData("http://localhost:8080/customer/book", data)
     handleCheckoutClose()
@@ -159,7 +187,7 @@ const CustomerCalendar = () => {
 
       {/* Instructional message */}
       <Box sx={{ backgroundColor: 'white', color: 'black', padding: '10px', textAlign: 'center', marginTop: '10px' }}>
-        Select a date to see available services
+        Selected: {selectedLongDate}
       </Box>
 
       {/* Layout container with calendar on the left and service dropdown on the right */}
@@ -243,7 +271,7 @@ const CustomerCalendar = () => {
           padding: '30px 43px', // Increase padding
           fontSize: '30px', // Increase font size
         }}
-        disabled={!selectedService || !selectedDate || !selectedTime} // Disable if conditions are not met.
+        disabled={!selectedService || !selectedDate || !selectedTime || !validSelectedTime(selectedTime)} // Disable if conditions are not met.
         onClick={handleBooking} // Handle booking button click.
       >
         Book Appointment
@@ -339,9 +367,17 @@ const CustomerCalendar = () => {
             fullWidth
             margin="normal"
           />
+          <TextField
+            label="Additional Notes"
+            value={notes}
+            onChange={e => setNotes(e.target.value)}
+            variant="outlined"
+            fullWidth
+            margin="normal"
+          />
 
           <Typography variant="h6" sx={{ marginBottom: '20px', marginTop: '20px' }}>
-            Thank you for your booking!
+            Thank you for booking!
           </Typography>
           <Button variant="contained" onClick={handleFormSend}>
             Submit and Book
@@ -358,7 +394,7 @@ const CustomerCalendar = () => {
         open={Boolean(anchorEl)} // Open state of the menu
         onClose={handleMenuClose} // Close the menu
       >
-        <MenuItem onClick={() => handleNavigation('/customer/home')}>Customer Calendar</MenuItem> {/* Navigate to Customer Calendar */}
+        <MenuItem onClick={() => handleNavigation('/customer/home')}>Customer Home</MenuItem> {/* Navigate to Customer Calendar */}
         <MenuItem onClick={() => handleNavigation('/customer/services')}>Available Services</MenuItem> {/* Navigate to Available Services */}
         <MenuItem onClick={handleMenuClose}>Close</MenuItem> {/* Close the menu */}
       </Menu>

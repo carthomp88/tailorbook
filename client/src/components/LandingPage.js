@@ -53,7 +53,7 @@ const LandingPage = () => {
     const resolveCase = async (caseNum) => {
       switch (caseNum) {
         case 3:
-            caseMsg.msg = "Email not registered"
+            caseMsg.msg = "Incorrect Email or Password"
             //console.log(caseMsg.msg)
             setAlert(caseMsg.msg)
             break;
@@ -72,7 +72,7 @@ const LandingPage = () => {
             }
             break;
         case 0:
-            caseMsg.msg = "Incorrect password"
+            caseMsg.msg = "Incorrect Email or Password"
             //console.log(caseMsg.msg)
             setAlert(caseMsg.msg)
             break;

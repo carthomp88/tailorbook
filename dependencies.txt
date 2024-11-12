@@ -2,4 +2,4 @@ CLIENT:
 axios, react
 
 SERVER:
-mongoose, nodemon, express, ejs, express-ejs-layouts, cors, dot-env
+mongoose, nodemon, express, ejs, express-ejs-layouts, cors, dot-env, bcrypt

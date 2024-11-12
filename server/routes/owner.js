@@ -10,7 +10,7 @@ router.get('/home', function(req, res) {
 router.get('/calendar', async (req, res) => {
     // Pull all appointments using a Mongo query
     Appointment.find()
-    .then(appointments => res.send({array: appointments}))
+    .then(appointments => res.send(JSON.stringify({array: appointments})))
     .catch(err => res.json(err))
         
     //console.log(appointmentQuery)

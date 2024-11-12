@@ -103,6 +103,7 @@ const OwnerCalendar = () => {
       >
         <MenuItem onClick={() => handleNavigation('/owner/services')}>Owner Services</MenuItem> {/* Navigate to Owner Page 1 */}
         <MenuItem onClick={() => handleNavigation('/owner/home')}>Owner Home</MenuItem> {/* Navigate to Owner Page 2 */}
+        <MenuItem onClick={() => navigate('/owner/site-settings')}>Site Settings</MenuItem>
         <MenuItem onClick={handleMenuClose}>Close</MenuItem> {/* Close the menu */}
       </Menu>
     </Box>
