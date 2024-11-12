@@ -183,12 +183,6 @@ const OwnerSiteSettings = () => {
         <TextField label="Social Media" value={contactSocial} onChange={(e) => setContactSocial(e.target.value)} fullWidth variant="outlined" sx={{ backgroundColor: '#f5f5f5' }} />
       </Box>
 
-      <Box sx={{ padding: '20px', textAlign: 'center' }}>
-        <Button variant="contained" color="primary" onClick={handleSave}>
-          Save
-        </Button>
-      </Box>
-
       {/* Hours Section */}
       <Box sx={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Typography variant="h5" sx={{ marginBottom: '10px' }}>Hours</Typography>
@@ -308,6 +302,11 @@ const OwnerSiteSettings = () => {
               </Box>
             </Box>
         </Box>
+        <Button
+        onClick={handleSave}>
+          Save Changes
+        </Button>
+        <Typography align='center'>{alertMsg}</Typography>
       </Box>
 
       {/* Single Day Custom Hours Section */}
@@ -321,43 +320,6 @@ const OwnerSiteSettings = () => {
               <Typography>Coming Soon :)</Typography>
             </Box>
         </Box>
-      </Box>
-
-      {/* Contact Information Section */}
-      <Box sx={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <Typography variant="h5" sx={{ marginBottom: '10px' }}>Contact Information</Typography>
-        
-        <TextField
-          label="Contact Email"
-          value={contactEmail}
-          onChange={(e) => setContactEmail(e.target.value)}
-          fullWidth
-          variant="outlined"
-          sx={{ backgroundColor: '#f5f5f5' }}
-        />
-        
-        <TextField
-          label="Contact Phone"
-          value={contactPhone}
-          onChange={(e) => setContactPhone(e.target.value)}
-          fullWidth
-          variant="outlined"
-          sx={{ backgroundColor: '#f5f5f5' }}
-        />
-        
-        <TextField
-          label="Social Media"
-          value={contactSocial}
-          onChange={(e) => setContactSocial(e.target.value)}
-          fullWidth
-          variant="outlined"
-          sx={{ backgroundColor: '#f5f5f5' }}
-        />
-        <Button
-        onClick={handleSave}>
-          Save Changes
-        </Button>
-        <Typography align='center'>{alertMsg}</Typography>
       </Box>
 
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
