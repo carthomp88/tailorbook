@@ -1,248 +1,181 @@
-import React, { useState } from 'react';
-import { AppBar, Box, IconButton, Menu, MenuItem, TextField, Toolbar, Typography, List, ListItem, ListItemText, Fab, Button } from '@mui/material';
-import { Menu as MenuIcon, Delete as DeleteIcon, Add as AddIcon, Edit as EditIcon } from '@mui/icons-material'; // Icons for deleting, adding, and editing services
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios'
+// OwnerServices Component
+// Manages a list of services, allowing the owner to add, edit, and delete services. 
+// Services are saved to localStorage, enabling persistence across page reloads. 
+// Additionally, images are converted to Base64 for storage in localStorage, ensuring they 
+// display correctly upon reload. This solution works well for small image files in a 
+// prototype or lightweight production setup.
 
-const res = await axios.get('http://localhost:8080/owner/services')
+import React, { useState, useEffect } from 'react';
+import { AppBar, Box, IconButton, Menu, MenuItem, TextField, Toolbar, Typography, List, ListItem, ListItemText, Fab, Button } from '@mui/material';
+import { Menu as MenuIcon, Delete as DeleteIcon, Add as AddIcon, Edit as EditIcon } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
 const OwnerServices = () => {
-  const navigate = useNavigate(); // Initialize useNavigate for navigation
-  const [anchorEl, setAnchorEl] = useState(null); // State to manage menu anchor
-  const [serviceName, setServiceName] = useState('');
-  const [serviceDescription, setServiceDescription] = useState('');
-  const [servicePrice, setServicePrice] = useState('');
-  const [serviceImage, setServiceImage] = useState(null); // Store the uploaded image file
-  const [editingIndex, setEditingIndex] = useState(null); // Track which service is being edited
-  const [showForm, setShowForm] = useState(false); // Toggle between service list and form view
-  const [services, setServices] = useState([]); // State to store the list of services
+  const navigate = useNavigate();
+  const [anchorEl, setAnchorEl] = useState(null); // For managing the menu anchor
+  const [serviceName, setServiceName] = useState(''); // Service name input
+  const [serviceDescription, setServiceDescription] = useState(''); // Service description input
+  const [servicePrice, setServicePrice] = useState(''); // Service price input
+  const [serviceImage, setServiceImage] = useState(null); // Stores Base64-encoded service image
+  const [editingIndex, setEditingIndex] = useState(null); // Tracks index of service being edited
+  const [showForm, setShowForm] = useState(false); // Toggle for displaying the service form
+  const [services, setServices] = useState([]); // Stores all services
+  
+  // Load services from localStorage on component mount
+  useEffect(() => {
+    const savedServices = JSON.parse(localStorage.getItem('services'));
+    if (savedServices) {
+      setServices(savedServices);
+    }
+  }, []);
 
-  const serviceData = res.data.array
-  serviceData.forEach((obj) => {
-    services.push({
-      name: obj.name, 
-      description: obj.desc, 
-      time: '' + obj.time + ' minutes',
-      price: '' + obj.price,
-      image: obj.imgURL
-    })
-  })
-
-  // Handle menu open
+  // Handle opening the menu
   const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget); // Set the anchor element for the menu
+    setAnchorEl(event.currentTarget);
   };
 
-  // Handle menu close
+  // Handle closing the menu
   const handleMenuClose = () => {
-    setAnchorEl(null); // Clear the anchor element to close the menu
+    setAnchorEl(null);
   };
 
-  // Define a function to handle navigation
+  // Navigate to other pages
   const handleNavigation = (path) => {
-    navigate(path); // Navigate to the specified path
-    handleMenuClose(); // Close the menu after navigation
+    navigate(path);
+    handleMenuClose();
   };
 
-  // Function to handle adding or updating a service
+  // Function to save updated services list to localStorage
+  const saveServicesToLocalStorage = (updatedServices) => {
+    localStorage.setItem('services', JSON.stringify(updatedServices));
+    setServices(updatedServices); // Update the services state
+  };
+
+  // Handle adding or updating a service entry
   const handleAddOrUpdateService = () => {
+    if (!serviceName || !serviceDescription || !servicePrice) return;
+
     const newService = {
       name: serviceName,
       description: serviceDescription,
       price: servicePrice,
-      image: serviceImage ? URL.createObjectURL(serviceImage) : services[editingIndex]?.image, // Retain the current image if not changed
+      image: serviceImage || services[editingIndex]?.image, // Use the existing image if editing
     };
 
+    let updatedServices;
     if (editingIndex !== null) {
-      // Update the existing service
-      const updatedServices = [...services];
+      // Update an existing service
+      updatedServices = [...services];
       updatedServices[editingIndex] = newService;
-      setServices(updatedServices);
-      setEditingIndex(null); // Reset the editing index
+      setEditingIndex(null);
     } else {
       // Add a new service
-      setServices([...services, newService]);
+      updatedServices = [...services, newService];
     }
 
-    // Clear the input fields and reset the image state
+    // Save the updated list to localStorage
+    saveServicesToLocalStorage(updatedServices);
+
+    // Clear input fields and hide form
     setServiceName('');
     setServiceDescription('');
     setServicePrice('');
     setServiceImage(null);
-    setShowForm(false); // Go back to the service list
+    setShowForm(false);
   };
 
-  // Function to handle deleting a service
+  // Handle deleting a service from the list
   const handleDeleteService = (index) => {
-    const updatedServices = services.filter((_, i) => i !== index); // Remove the service by index
-    setServices(updatedServices); // Update the services state
+    const updatedServices = services.filter((_, i) => i !== index);
+    saveServicesToLocalStorage(updatedServices); // Update localStorage with the new list
   };
 
-  // Function to handle editing a service
+  // Prepare service data for editing
   const handleEditService = (index) => {
     const service = services[index];
     setServiceName(service.name);
     setServiceDescription(service.description);
     setServicePrice(service.price);
-    setServiceImage(null); // Set to null to avoid overriding the image unless a new one is uploaded
-    setEditingIndex(index); // Set the editing index to track which service is being edited
-    setShowForm(true); // Show the form for editing
+    setServiceImage(service.image);
+    setEditingIndex(index);
+    setShowForm(true);
   };
 
-  // Function to handle file input (image upload)
+  // Convert image to Base64 on upload
   const handleImageUpload = (e) => {
-    setServiceImage(e.target.files[0]); // Store the selected image file in state
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setServiceImage(reader.result); // Set Base64-encoded image
+      };
+      reader.readAsDataURL(file); // Convert file to Base64 format
+    }
   };
 
   return (
-    <Box sx={{ padding: '20px', backgroundColor: '#f5f5f5', minHeight: '100vh' }}> {/* Light background */}
-      
-      {/* AppBar with a modern white background and subtle shadow */}
+    <Box sx={{ padding: '20px', backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
+      {/* AppBar with a title and menu */}
       <AppBar position="static" sx={{ backgroundColor: '#ffffff', boxShadow: 'none', borderBottom: '1px solid #e0e0e0' }}>
         <Toolbar>
           <Typography variant="h4" sx={{ flexGrow: 1, textAlign: 'center', color: '#000000', fontWeight: 'bold' }}>
             Owner Services
           </Typography>
           <IconButton edge="end" color="inherit" aria-label="menu" onClick={handleMenuOpen}>
-            <MenuIcon sx={{ color: '#000000' }} /> {/* Modern black hamburger menu icon */}
+            <MenuIcon sx={{ color: '#000000' }} />
           </IconButton>
         </Toolbar>
       </AppBar>
 
-      {/* Hamburger menu for navigation */}
-      <Menu
-        anchorEl={anchorEl} // Anchor element for the menu
-        open={Boolean(anchorEl)} // Open state of the menu
-        onClose={handleMenuClose} // Close the menu
-      >
-        <MenuItem onClick={() => handleNavigation('/owner/home')}>Owner Home</MenuItem> {/* Navigate to Owner Home */}
-        <MenuItem onClick={() => handleNavigation('/owner/calendar')}>Owner Calendar</MenuItem> {/* Navigate to Owner Calendar */}
+      {/* Hamburger Menu */}
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+        <MenuItem onClick={() => handleNavigation('/owner/home')}>Owner Home</MenuItem>
+        <MenuItem onClick={() => handleNavigation('/owner/calendar')}>Owner Calendar</MenuItem>
         <MenuItem onClick={() => navigate('/owner/site-settings')}>Site Settings</MenuItem>
-        <MenuItem onClick={handleMenuClose}>Close</MenuItem> {/* Close the menu */}
+        <MenuItem onClick={handleMenuClose}>Close</MenuItem>
       </Menu>
 
-      {/* Show the list of services if the form is not being displayed */}
+      {/* Conditional rendering for the services list or the service form */}
       {!showForm ? (
         <>
-          <Typography variant="h4" sx={{ textAlign: 'center', marginBottom: '20px' }}>
-            Services List
-          </Typography>
-
-          {/* Display list of services */}
+          <Typography variant="h4" sx={{ textAlign: 'center', marginBottom: '20px' }}>Services List</Typography>
+          {/* Display list of saved services */}
           {services.length > 0 ? (
             <List>
               {services.map((service, index) => (
-                <ListItem
-                  key={index}
-                  sx={{ backgroundColor: 'white', marginBottom: '10px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)', display: 'flex', alignItems: 'center' }}
-                >
-                  {/* Display service image */}
-                  <Box
-                    component="img"
-                    src={service.image}
-                    alt={service.name}
-                    sx={{ width: '100px', height: '100px', borderRadius: '10px', marginRight: '20px' }}
-                  />
-
-                  {/* Display service details */}
-                  <ListItemText
-                    primary={service.name}
-                    secondary={`${service.description} - $${service.price}`}
-                  />
-
-                  {/* Edit button */}
-                  <IconButton edge="end" aria-label="edit" onClick={() => handleEditService(index)}>
-                    <EditIcon />
-                  </IconButton>
-
-                  {/* Delete button for the service */}
-                  <IconButton edge="end" aria-label="delete" onClick={() => handleDeleteService(index)}>
-                    <DeleteIcon />
-                  </IconButton>
+                <ListItem key={index} sx={{ backgroundColor: 'white', marginBottom: '10px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)' }}>
+                  <Box component="img" src={service.image} alt={service.name} sx={{ width: '100px', height: '100px', borderRadius: '10px', marginRight: '20px' }} />
+                  <ListItemText primary={service.name} secondary={`${service.description} - ${service.price}`} />
+                  <IconButton edge="end" aria-label="edit" onClick={() => handleEditService(index)}><EditIcon /></IconButton>
+                  <IconButton edge="end" aria-label="delete" onClick={() => handleDeleteService(index)}><DeleteIcon /></IconButton>
                 </ListItem>
               ))}
             </List>
           ) : (
-            <Typography variant="h6" sx={{ textAlign: 'center', marginTop: '20px' }}>
-              No services created yet.
-            </Typography>
+            <Typography variant="h6" sx={{ textAlign: 'center', marginTop: '20px' }}>No services created yet.</Typography>
           )}
 
-          {/* Floating + button to add more services */}
-          <Fab
-            color="primary"
-            aria-label="add"
-            onClick={() => setShowForm(true)} // Show the form when clicked
-            sx={{ position: 'fixed', bottom: '20px', right: '20px' }}
-          >
+          {/* Floating button to add services */}
+          <Fab color="primary" aria-label="add" onClick={() => setShowForm(true)} sx={{ position: 'fixed', bottom: '20px', right: '20px' }}>
             <AddIcon />
           </Fab>
         </>
       ) : (
         <>
-          <Typography variant="h4" sx={{ textAlign: 'center', marginBottom: '20px' }}>
-            {editingIndex !== null ? 'Edit Service' : 'Add New Service'} {/* Dynamic heading for editing or adding */}
-          </Typography>
+          <Typography variant="h4" sx={{ textAlign: 'center', marginBottom: '20px' }}>{editingIndex !== null ? 'Edit Service' : 'Add New Service'}</Typography>
 
-          {/* Input fields for adding or editing services */}
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '20px' }}>
-            {/* Input for service name */}
-            <TextField
-              label="Service Name"
-              value={serviceName}
-              onChange={(e) => setServiceName(e.target.value)}
-              fullWidth
-              variant="outlined"
-              sx={{ backgroundColor: 'white' }}
-            />
+          {/* Form for adding or editing services */}
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, marginBottom: '20px' }}>
+            <TextField label="Service Name" value={serviceName} onChange={(e) => setServiceName(e.target.value)} fullWidth variant="outlined" />
+            <TextField label="Service Description" value={serviceDescription} onChange={(e) => setServiceDescription(e.target.value)} fullWidth variant="outlined" />
+            <TextField label="Service Price" value={servicePrice} onChange={(e) => setServicePrice(e.target.value)} fullWidth variant="outlined" />
+            <TextField type="file" onChange={handleImageUpload} fullWidth variant="outlined" />
 
-            {/* Input for service description */}
-            <TextField
-              label="Service Description"
-              value={serviceDescription}
-              onChange={(e) => setServiceDescription(e.target.value)}
-              fullWidth
-              variant="outlined"
-              sx={{ backgroundColor: 'white' }}
-            />
-
-            {/* Input for service price */}
-            <TextField
-              label="Service Price"
-              value={servicePrice}
-              onChange={(e) => setServicePrice(e.target.value)}
-              fullWidth
-              variant="outlined"
-              sx={{ backgroundColor: 'white' }}
-            />
-
-            {/* File input for uploading service image */}
-            <TextField
-              type="file"
-              onChange={handleImageUpload}
-              fullWidth
-              variant="outlined"
-              sx={{ backgroundColor: 'white' }}
-            />
-
-            {/* Button to add or save the service */}
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleAddOrUpdateService}
-              sx={{ alignSelf: 'center', width: '200px' }}
-              disabled={!serviceName || !serviceDescription || !servicePrice || (!serviceImage && editingIndex === null)} // Disable button if any field is missing
-            >
-              {editingIndex !== null ? 'Save Changes' : 'Add Service'} {/* Dynamic button text for editing or adding */}
+            {/* Save/Cancel buttons */}
+            <Button variant="contained" color="primary" onClick={handleAddOrUpdateService} disabled={!serviceName || !serviceDescription || !servicePrice || (!serviceImage && editingIndex === null)}>
+              {editingIndex !== null ? 'Save Changes' : 'Add Service'}
             </Button>
-
-            {/* Button to cancel adding or editing service and go back to list */}
-            <Button
-              variant="outlined"
-              color="secondary"
-              onClick={() => { setShowForm(false); setEditingIndex(null); }} // Hide the form and reset editing index
-              sx={{ alignSelf: 'center', width: '200px', marginTop: '10px' }}
-            >
+            <Button variant="outlined" color="secondary" onClick={() => { setShowForm(false); setEditingIndex(null); }}>
               Cancel
             </Button>
           </Box>
