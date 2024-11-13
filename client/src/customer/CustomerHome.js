@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { AppBar, Box, IconButton, Menu, MenuItem, Toolbar, Typography } from '@mui/material';
-import { Menu as MenuIcon } from '@mui/icons-material'; // Import hamburger menu icon
-import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
+import { AppBar, Box, IconButton, Menu, MenuItem, Toolbar, Typography, Button, Card, CardContent } from '@mui/material';
+import { Menu as MenuIcon } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 import haircutImage from './haircut.jpg';
 import massageImage from './massage.jpg';
-import axios from 'axios'
+import axios from 'axios';
 
-const landing = await axios.get('http://localhost:8080/landing')
+// Fetch landing data from server
+const landingData = await axios.get('http://localhost:8080/landing').then(res => res.data);
 
 const images = {
   Haircut: haircutImage,
@@ -14,126 +15,123 @@ const images = {
 };
 
 const CustomerHome = () => {
-  const name = useState(landing.data.name)
-  const info = useState(landing.data.info)
-  const email = useState(landing.data.email)
-  const phone = useState(landing.data.phone)
-  const social = useState(landing.data.social)
+  const { name, info, email, phone, social } = landingData;
+  const navigate = useNavigate();
+  const [anchorEl, setAnchorEl] = useState(null);
 
-  const navigate = useNavigate(); // Initialize useNavigate for navigation
-  const [anchorEl, setAnchorEl] = useState(null); // State to manage menu anchor
+  // Handle menu open and close
+  const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
+  const handleMenuClose = () => setAnchorEl(null);
 
-  // Handle menu open
-  const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget); // Set the anchor element for the menu
-  };
-
-  // Handle menu close
-  const handleMenuClose = () => {
-    setAnchorEl(null); // Clear the anchor element to close the menu
-  };
-
-  // Function to handle navigation
   const handleNavigation = (path) => {
-    navigate(path); // Navigate to the specified path
-    handleMenuClose(); // Close the menu after navigation
+    navigate(path);
+    handleMenuClose();
   };
 
   return (
-    <Box sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh', paddingBottom: '100px' }}> {/* Light background and space for the bottom bar */}
-      <AppBar position="static" sx={{ backgroundColor: '#ffffff', boxShadow: 'none', borderBottom: '1px solid #e0e0e0' }}> {/* Clean white AppBar */}
+    <Box sx={{ backgroundColor: '#ffffff', minHeight: '100vh', paddingBottom: '100px' }}>
+      {/* Fixed AppBar */}
+      <AppBar position="fixed" sx={{ backgroundColor: '#f5f5f5', borderBottom: '1px solid #ddd', boxShadow: '0px 2px 8px rgba(0,0,0,0.05)' }}>
         <Toolbar>
-          <Typography variant="h4" sx={{ flexGrow: 1, textAlign: 'center', color: '#000000', fontWeight: 'bold' }}> {/* Black bold text */}
-            Customer Home
-          </Typography>
-          <IconButton edge="end" color="inherit" aria-label="menu" onClick={handleMenuOpen}>
-            <MenuIcon sx={{ color: '#000000' }} /> {/* Black hamburger menu icon */}
+          <IconButton edge="start" color="inherit" onClick={handleMenuOpen}>
+            <MenuIcon sx={{ color: '#333' }} />
           </IconButton>
+          <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center', color: '#333' }}>
+            Welcome to {name}
+          </Typography>
         </Toolbar>
       </AppBar>
 
-      {/* Main container for layout */}
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: '20px' }}>
-        {/* Left vertical rectangle for pictures */}
+      {/* Centered Company Name */}
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', paddingTop: '90px', paddingBottom: '30px' }}>
+        <Typography variant="h2" sx={{ color: '#333', fontWeight: '700', textAlign: 'center' }}>
+          {name}
+        </Typography>
+      </Box>
+
+      {/* Main content layout */}
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: '30px', gap: '20px' }}>
+        {/* Left picture box */}
         <Box sx={{
           backgroundColor: '#ffffff',
-          width: '300px',
-          height: '600px',
+          width: '280px',
+          height: '450px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          margin: '50px',
-          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)', // Subtle shadow for modern effect
-          borderRadius: '10px', // Rounded corners
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+          borderRadius: '12px',
+          overflow: 'hidden'
         }}>
-          <img src={images.Haircut} alt="Service 1" style={{ maxWidth: '100%', maxHeight: '100%', height: '400px', borderRadius: '10px' }} /> {/* Rounded corners for images */}
+          <img src={images.Haircut} alt="Service 1" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         </Box>
 
-        {/* Middle large vertical rectangle for available services */}
-        <Box sx={{
+        {/* Center information box */}
+        <Card sx={{
           backgroundColor: '#ffffff',
-          width: '400px',
-          height: '600px',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'space-around',
-          margin: '50px',
-          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)', // Subtle shadow for modern effect
-          borderRadius: '10px', // Rounded corners
-          padding: '20px', // Padding inside the box
+          width: '380px',
+          padding: '20px',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+          borderRadius: '12px',
+          textAlign: 'center',
         }}>
-          <Typography variant="h2" textAlign="center" sx={{ color: '#000000', fontWeight: 'bold' }}>{name}</Typography>
-          <Typography variant="h5" sx={{ color: '#555555' }}>Welcome to Gabe's Spa & Salon!</Typography>
-          <Typography variant="h5" sx={{ color: '#555555' }}>{info}</Typography>
-          <Typography variant="h5" sx={{ color: '#555555' }}>Hours: M-S: 9-5 | Sundays: Closed</Typography>
-        </Box>
+          <CardContent>
+            <Typography variant="h4" sx={{ color: '#333', fontWeight: '600' }}>{name}</Typography>
+            <Typography variant="subtitle1" sx={{ color: '#555', marginY: '10px' }}>{info}</Typography>
+            <Typography variant="body1" sx={{ color: '#777' }}>Hours: M-S: 9-5 | Sundays: Closed</Typography>
+          </CardContent>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => handleNavigation('/customer/services')}
+            sx={{ marginTop: '20px', fontWeight: '600', backgroundColor: '#333', color: '#fff', padding: '10px 20px', borderRadius: '8px' }}
+          >
+            See Services
+          </Button>
+        </Card>
 
-        {/* Right vertical rectangle for pictures */}
+        {/* Right picture box */}
         <Box sx={{
           backgroundColor: '#ffffff',
-          width: '300px',
-          height: '600px',
+          width: '280px',
+          height: '450px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          margin: '50px',
-          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)', // Subtle shadow for modern effect
-          borderRadius: '10px', // Rounded corners
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+          borderRadius: '12px',
+          overflow: 'hidden'
         }}>
-          <img src={images.Massage} alt="Service 2" style={{ maxWidth: '100%', maxHeight: '100%', height: '400px', borderRadius: '10px' }} /> {/* Rounded corners for images */}
+          <img src={images.Massage} alt="Service 2" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         </Box>
       </Box>
 
-       {/* Fixed bottom bar for contact information */}
-       <Box sx={{
+      {/* Bottom contact information bar */}
+      <Box sx={{
         backgroundColor: '#ffffff',
         width: '100%',
         height: '100px',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between', // Space out text boxes
-        position: 'fixed', // Fixed at the bottom
-        bottom: '0', // Stick to the bottom of the viewport
-        padding: '0 20px', // Add padding to the sides
-        boxShadow: '0 -4px 10px rgba(0, 0, 0, 0.1)', // Subtle shadow at the bottom
+        justifyContent: 'space-around',
+        position: 'fixed',
+        bottom: '0',
+        boxShadow: '0 -4px 12px rgba(0, 0, 0, 0.08)',
+        padding: '0 20px',
       }}>
-        <Typography sx={{ color: '#555555', width: '30%', textAlign: 'right' }}>Email: {email}</Typography>
-        <Typography sx={{ color: '#555555', width: '30%', textAlign: 'center' }}>Phone Number: {phone}</Typography>
-        <Typography sx={{ color: '#555555', width: '30%', textAlign: 'left' }}>Social Media: {social}</Typography>
+        <Typography sx={{ color: '#555' }}>Email: {email}</Typography>
+        <Typography sx={{ color: '#555' }}>Phone: {phone}</Typography>
+        <Typography sx={{ color: '#555' }}>Social Media: {social}</Typography>
       </Box>
-      {/* Hamburger menu for navigation */}
-      <Menu
-        anchorEl={anchorEl} // Anchor element for the menu
-        open={Boolean(anchorEl)} // Open state of the menu
-        onClose={handleMenuClose} // Close the menu
-      >
-        <MenuItem onClick={() => handleNavigation('/customer/calendar')}>Customer Calendar</MenuItem> {/* Navigate to Customer Calendar */}
-        <MenuItem onClick={() => handleNavigation('/customer/services')}>Available Services</MenuItem> {/* Navigate to Available Services */}
-        <MenuItem onClick={handleMenuClose}>Close</MenuItem> {/* Close the menu */}
+
+      {/* Hamburger menu */}
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+        <MenuItem onClick={() => handleNavigation('/customer/calendar')}>Customer Calendar</MenuItem>
+        <MenuItem onClick={() => handleNavigation('/customer/services')}>Available Services</MenuItem>
+        <MenuItem onClick={handleMenuClose}>Close</MenuItem>
       </Menu>
     </Box>
   );
 };
 
-export default CustomerHome; // Export the component for use in other files
+export default CustomerHome;
