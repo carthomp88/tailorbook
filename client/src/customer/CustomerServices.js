@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { AppBar, Box, IconButton, Menu, MenuItem, Toolbar, Typography } from '@mui/material';
+import { AppBar, Box, IconButton, Menu, MenuItem, Toolbar, Typography, Button } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import haircutImage from './haircut.jpg';
 import massageImage from './massage.jpg';
 import manicureImage from './manicure.webp';
 import facialImage from './facial.jpg';
-import axios from 'axios'
+import axios from 'axios';
 
-const res = await axios.get('http://localhost:8080/customer/services')
+const res = await axios.get('http://localhost:8080/customer/services');
 
 const images = {
   Haircut: haircutImage,
@@ -48,16 +48,16 @@ const services = [
   },
 ];
 
-const serviceData = res.data.array
+const serviceData = res.data.array;
 serviceData.forEach((obj) => {
   services.push({
-    name: obj.name, 
-    description: obj.desc, 
+    name: obj.name,
+    description: obj.desc,
     time: '' + obj.time + ' minutes',
     price: '$' + obj.price,
-    image: obj.imgURL
-  })
-})
+    image: obj.imgURL,
+  });
+});
 
 const AvailableServices = () => {
   const navigate = useNavigate();
@@ -78,12 +78,20 @@ const AvailableServices = () => {
 
   return (
     <Box sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh', padding: '20px' }}>
-      {/* Header with white background and subtle shadow */}
+      {/* Header with white background, subtle shadow, and Book Now button */}
       <AppBar position="static" sx={{ backgroundColor: '#ffffff', boxShadow: 'none', borderBottom: '1px solid #e0e0e0' }}>
         <Toolbar>
           <Typography variant="h4" sx={{ flexGrow: 1, textAlign: 'center', color: '#000000', fontWeight: 'bold' }}>
             Available Services
           </Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => handleNavigation('/customer/calendar')}
+            sx={{ backgroundColor: '#333', color: '#ffffff', fontWeight: 'bold', marginRight: '10px' }}
+          >
+            Book Now
+          </Button>
           <IconButton edge="end" color="inherit" aria-label="menu" onClick={handleMenuOpen}>
             <MenuIcon sx={{ color: '#000000' }} />
           </IconButton>

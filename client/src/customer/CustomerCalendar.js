@@ -1,4 +1,3 @@
-// Import necessary libraries and components.
 import React, { useState } from 'react';
 import { AppBar, Box, Button, IconButton, Menu, MenuItem, Select, Toolbar, Typography, TextField } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material';
@@ -7,173 +6,106 @@ import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import axios from 'axios';
-import postData from '../components/functions.js'
+import postData from '../components/functions.js';
 
-// Grab calendar data way up here
 const calendarData = await axios.get('http://localhost:8080/customer/calendar');
-const hoursData = await axios.get('http://localhost:8080/landing')
+const hoursData = await axios.get('http://localhost:8080/landing');
 
-const hours = []
-hours.push(hoursData.data.hours.sunday)
-hours.push(hoursData.data.hours.monday)
-hours.push(hoursData.data.hours.tuesday)
-hours.push(hoursData.data.hours.wednesday)
-hours.push(hoursData.data.hours.thursday)
-hours.push(hoursData.data.hours.friday)
-hours.push(hoursData.data.hours.saturday)
+const hours = [
+  hoursData.data.hours.sunday,
+  hoursData.data.hours.monday,
+  hoursData.data.hours.tuesday,
+  hoursData.data.hours.wednesday,
+  hoursData.data.hours.thursday,
+  hoursData.data.hours.friday,
+  hoursData.data.hours.saturday,
+];
 
-// Create a localizer for the calendar using moment.js, which will handle date parsing and formatting.
 const localizer = momentLocalizer(moment);
 
-// Define the main functional component for the Customer Calendar page.
 const CustomerCalendar = () => {
-  const navigate = useNavigate(); // Hook to manage navigation between different routes/pages.
+  const navigate = useNavigate();
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedService, setSelectedService] = useState('');
+  const [selectedDate, setSelectedDate] = useState(moment().format('YYYY-MM-DD'));
+  const [selectedTime, setSelectedTime] = useState('');
+  const [showCheckoutPopup, setShowCheckoutPopup] = useState(false);
 
-  const [anchorEl, setAnchorEl] = useState(null); // State variable to manage the anchor element for the dropdown menu.
-  const [selectedService, setSelectedService] = useState(''); // State variable to store the selected service from the dropdown.
-  const [selectedDate, setSelectedDate] = useState(moment().format('YYYY-MM-DD')); // State variable to store the selected date from the calendar.
-  const [selectedDOW, setDOW] = useState(moment().day())
-  const [selectedLongDate, setLongDate] = useState(moment().format('MMMM Do YYYY'))
-  const [selectedTime, setSelectedTime] = useState(''); // State variable to store the selected time for the appointment.
-  const [showCheckoutPopup, setShowCheckoutPopup] = useState(false); // State to manage checkout popup visibility.
-
-  // New state variables for customer contact info and credit card details
   const [customerFirstName, setCustomerFirstName] = useState('');
   const [customerLastName, setCustomerLastName] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
-  const [cardNumber, setCardNumber] = useState('');
-  const [cardExpiration, setCardExpiration] = useState('');
-  const [cardCVC, setCardCVC] = useState('');
   const [notes, setNotes] = useState('');
-
-  const validSelectedTime = (selectedTime) => {
-    const dayOfWeek = moment(selectedDate).day()
-    if (hours[dayOfWeek].open === 'Closed') return false
-    const selectedMoment = moment(selectedTime, 'h:mm a')
-    const openMoment = moment(hours[dayOfWeek].open, 'h:mm a')
-    const closeMoment = moment(hours[dayOfWeek].close, 'h:mm a')
-    if (selectedMoment.isBefore(openMoment) || selectedMoment.isSameOrAfter(closeMoment)) {return false}
-    return true
-  }
-
-  // Object defining available services based on specific dates.
-  const serviceAvailability = {
-    1: ['Haircut', 'Massage', 'Facial'],
-    2: ['Haircut', 'Manicure'],
-    3: ['Pedicure', 'Massage', 'Facial'],
-    4: ['Facial', 'Pedicure', 'Manicure'],
-    5: ['Haircut', 'Massage'],
-    6: ['Haircut', 'Massage', 'Facial', 'Manicure', 'Pedicure'],
-    0: []
-  };
-
-  // Sample appointment data for testing unavailable slots next week
-  const sampleAppointments = [
-    { date: '2024-11-30T10:00:00' }, // November 30th, 10 AM
-    { date: '2024-11-29T13:00:00' }, // November 29th, 1 PM
-    { date: '2024-11-11T09:00:00' }, // November 11th, 9 AM
-    { date: '2024-11-12T14:00:00' }, // November 12th, 2 PM
-    { date: '2024-11-13T16:00:00' }, // November 13th, 4 PM
-  ];
 
   const appointments = [];
 
-  const appointmentData = calendarData.data.array
-
-  sampleAppointments.forEach(aptmt => {
-    const date = new Date(aptmt.date);
-    appointments.push({ title: 'Unavailable', start: new Date(date), end: new Date(moment(date).add(1, 'hours')) });
-  })
-
-  // Populate events with calendar data from server
-  appointmentData.forEach((obj) => {
+  // Load appointments from calendar data and add sample data for unavailable slots
+  calendarData.data.array.forEach((obj) => {
     const date = new Date(obj.date);
-    appointments.push({ title: 'Unavailable', start: new Date(date), end: new Date(moment(date).add(1, 'hours')) });
+    appointments.push({ title: 'Unavailable', start: date, end: new Date(moment(date).add(1, 'hours')) });
   });
 
   const [events] = useState(appointments);
 
-  // Handle date selection on the calendar.
   const handleDateSelect = (slotInfo) => {
-    const selectedDate = moment(slotInfo.start).format('YYYY-MM-DD'); // Format the selected date.
-    const dayOfWeek = moment(slotInfo.start).day()
-    const longDate = moment(slotInfo.start).format('MMMM Do YYYY')
-    setSelectedDate(selectedDate); // Update the state with the selected date.
-    setDOW(dayOfWeek)
-    setLongDate(longDate)
-    setSelectedService(''); // Reset selected service when the date changes.
-    setSelectedTime(''); // Reset selected time when the date changes.
+    const selectedDate = moment(slotInfo.start).format('YYYY-MM-DD');
+    setSelectedDate(selectedDate);
+    setSelectedService('');
+    setSelectedTime('');
   };
 
-  // Get available services for the selected date.
-  const availableServices = selectedDOW && serviceAvailability[selectedDOW] ? serviceAvailability[selectedDOW] : [];
-  // Handle service selection in the dropdown.
   const handleServiceChange = (event) => {
-    setSelectedService(event.target.value); // Update selected service.
+    setSelectedService(event.target.value);
   };
 
-  // PARSE OPEN AND CLOSE HOURS HERE! SOMEHOW! DO IT!
+  const handleTimeChange = (event) => {
+    setSelectedTime(event.target.value);
+  };
+
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleNavigation = (path) => {
+    navigate(path);
+    handleMenuClose();
+  };
+
+  const handleBooking = () => {
+    setShowCheckoutPopup(true);
+  };
+
+  const handleCheckoutClose = () => {
+    setShowCheckoutPopup(false);
+    setCustomerFirstName('');
+    setCustomerLastName('');
+    setCustomerEmail('');
+    setCustomerPhone('');
+    setSelectedService('');
+    setSelectedTime('');
+  };
 
   const handleFormSend = () => {
     const data = {
-      date: new Date('' + selectedDate + 'T' + selectedTime),
+      date: new Date(`${selectedDate}T${selectedTime}`),
       firstName: customerFirstName,
       lastName: customerLastName,
       email: customerEmail,
       phonenum: customerPhone,
       type: selectedService,
-      notes: notes
-    }
-    postData("http://localhost:8080/customer/book", data)
-    handleCheckoutClose()
-  }
-
-  // Handle time selection based on the selected service and date
-  const handleTimeChange = (event) => {
-    setSelectedTime(event.target.value); // Update selected time.
+      notes: notes,
+    };
+    postData('http://localhost:8080/customer/book', data);
+    handleCheckoutClose();
   };
 
-  // Handle the opening of the hamburger menu.
-  const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  // Handle the closing of the hamburger menu.
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  // Navigate to a specific page.
-  const handleNavigation = (path) => {
-    navigate(path); // Use the navigate function to move to a different route.
-    handleMenuClose(); // Close the menu after navigating.
-  };
-
-  // Handle the booking button click to show checkout popup.
-  const handleBooking = () => {
-    setShowCheckoutPopup(true); // Show the checkout popup.
-  };
-
-  // Handle checkout popup close action.
-  const handleCheckoutClose = () => {
-    setShowCheckoutPopup(false); // Hide the checkout popup.
-    // Clear the form fields when closing the popup
-    setCustomerFirstName('');
-    setCustomerLastName('');
-    setCustomerEmail('');
-    setCustomerPhone('');
-    setCardNumber('');
-    setCardExpiration('');
-    setCardCVC('');
-    setSelectedService('');
-    setSelectedTime('');
-  };
-
-  // Return the main JSX structure.
   return (
     <Box sx={{ backgroundColor: '#f5f5f5', height: '100vh', padding: '20px' }}>
-      {/* AppBar with page title and menu button */}
+      {/* AppBar */}
       <AppBar position="static" sx={{ backgroundColor: '#ffffff', boxShadow: 'none', borderBottom: '1px solid #e0e0e0' }}>
         <Toolbar>
           <Typography variant="h4" sx={{ flexGrow: 1, textAlign: 'center', color: '#000000', fontWeight: 'bold' }}>
@@ -185,80 +117,62 @@ const CustomerCalendar = () => {
         </Toolbar>
       </AppBar>
 
-      {/* Instructional message */}
+      {/* Selected Date */}
       <Box sx={{ backgroundColor: 'white', color: 'black', padding: '10px', textAlign: 'center', marginTop: '10px' }}>
-        Selected: {selectedLongDate}
+        Selected Date: {moment(selectedDate).format('MMMM Do YYYY')}
       </Box>
 
-      {/* Layout container with calendar on the left and service dropdown on the right */}
+      {/* Calendar and selection fields */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', padding: '20px' }}>
-        {/* Calendar section */}
+        {/* Calendar */}
         <Box
           sx={{
             width: '70%',
             height: '800px',
-            overflow: 'hidden',
             border: '1px solid #ccc',
             backgroundColor: '#fff',
             boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
           }}
         >
           <Calendar
-            localizer={localizer} // Moment.js localizer for dates.
-            events={events} // Example events.
+            localizer={localizer}
+            events={events}
             startAccessor="start"
             endAccessor="end"
             style={{ height: '100%', width: '100%' }}
-            selectable // Enable date selection.
-            onSelectSlot={handleDateSelect} // Handle date selection.
+            selectable
+            onSelectSlot={handleDateSelect}
           />
         </Box>
 
-        {/* Service dropdown section */}
-        <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        {/* Service and Time selection */}
+        <Box sx={{ display: 'flex', flexDirection: 'column', width: '25%', gap: 2 }}>
           <Select
-            value={selectedService} // Currently selected service.
-            onChange={handleServiceChange} // Handle service selection.
+            value={selectedService}
+            onChange={handleServiceChange}
             variant="outlined"
-            sx={{
-              backgroundColor: 'white',
-              width: '400px',
-              height: '100px',
-              marginTop: '50px',
-              fontSize: '24px',
-              padding: '10px',
-            }}
-            disabled={!selectedDate} // Disable if no date selected.
+            sx={{ backgroundColor: 'white', width: '100%', height: '50px', marginTop: '50px', fontSize: '18px' }}
+            disabled={!selectedDate}
           >
             <MenuItem value="" disabled>
               {selectedDate ? 'Select a Service' : 'Select a Date First'}
             </MenuItem>
-
-            {/* Render available services in the dropdown */}
-            {availableServices.map((service) => (
-              <MenuItem key={service} value={service} sx={{ fontSize: '24px' }}>
-                {service}
-              </MenuItem>
-            ))}
+            <MenuItem value="Haircut">Haircut</MenuItem>
+            <MenuItem value="Massage">Massage</MenuItem>
           </Select>
 
-          {/* Time selection input placed above the Book Appointment button */}
           <TextField
-            type="time" // Input for selecting appointment time.
+            type="time"
             value={selectedTime}
             onChange={handleTimeChange}
             variant="outlined"
-            sx={{
-              marginBottom: '300px',
-              width: '400px',
-              fontSize: '24px',
-            }}
-            disabled={!selectedService} // Disable if no service selected.
+            sx={{ width: '100%', fontSize: '18px' }}
+            disabled={!selectedService}
           />
         </Box>
       </Box>
 
-      {/* Booking button */}
+      {/* Book Appointment Button */}
       <Button
         variant="contained"
         sx={{
@@ -267,12 +181,11 @@ const CustomerCalendar = () => {
           right: '50px',
           backgroundColor: '#007bff',
           color: '#fff',
-          '&:hover': { backgroundColor: '#0056b3' },
-          padding: '30px 43px', // Increase padding
-          fontSize: '30px', // Increase font size
+          fontSize: '20px',
+          padding: '20px 30px',
         }}
-        disabled={!selectedService || !selectedDate || !selectedTime || !validSelectedTime(selectedTime)} // Disable if conditions are not met.
-        onClick={handleBooking} // Handle booking button click.
+        disabled={!selectedService || !selectedDate || !selectedTime}
+        onClick={handleBooking}
       >
         Book Appointment
       </Button>
@@ -287,120 +200,48 @@ const CustomerCalendar = () => {
             transform: 'translate(-50%, -50%)',
             backgroundColor: 'white',
             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-            width: '900px', // Increased width for the popup
-            height: '700px', // Increased height for the popup
+            width: '400px',
             borderRadius: '8px',
-            padding: '40px',
+            padding: '20px',
             zIndex: 1000,
-            overflow: 'auto', // Added to handle overflow of content if necessary
           }}
         >
           <Typography variant="h5" sx={{ marginBottom: '20px' }}>
-            Booking Confirmation
+            Confirm Booking
           </Typography>
-          <Typography variant="h6" sx={{ marginBottom: '20px' }}>
+          <Typography variant="h6" sx={{ marginBottom: '10px' }}>
             Service: {selectedService}
           </Typography>
-          <Typography variant="h6" sx={{ marginBottom: '20px' }}>
-            Date: {selectedDate}
+          <Typography variant="h6" sx={{ marginBottom: '10px' }}>
+            Date: {moment(selectedDate).format('MMMM Do YYYY')}
           </Typography>
-          <Typography variant="h6" sx={{ marginBottom: '20px' }}>
+          <Typography variant="h6" sx={{ marginBottom: '10px' }}>
             Time: {selectedTime}
           </Typography>
-
-          {/* Customer contact info fields */}
-          <TextField
-            label="First Name"
-            value={customerFirstName}
-            onChange={(e) => setCustomerFirstName(e.target.value)}
-            variant="outlined"
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Last Name"
-            value={customerLastName}
-            onChange={(e) => setCustomerLastName(e.target.value)}
-            variant="outlined"
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Email"
-            value={customerEmail}
-            onChange={(e) => setCustomerEmail(e.target.value)}
-            variant="outlined"
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Phone"
-            value={customerPhone}
-            onChange={(e) => setCustomerPhone(e.target.value)}
-            variant="outlined"
-            fullWidth
-            margin="normal"
-          />
-
-          {/* Credit Card info fields */}
-          <TextField
-            label="Credit Card Number"
-            value={cardNumber}
-            onChange={(e) => setCardNumber(e.target.value)}
-            variant="outlined"
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Expiration Date (MM/YY)"
-            value={cardExpiration}
-            onChange={(e) => setCardExpiration(e.target.value)}
-            variant="outlined"
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="CVC"
-            value={cardCVC}
-            onChange={(e) => setCardCVC(e.target.value)}
-            variant="outlined"
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Additional Notes"
-            value={notes}
-            onChange={e => setNotes(e.target.value)}
-            variant="outlined"
-            fullWidth
-            margin="normal"
-          />
-
-          <Typography variant="h6" sx={{ marginBottom: '20px', marginTop: '20px' }}>
-            Thank you for booking!
-          </Typography>
-          <Button variant="contained" onClick={handleFormSend}>
-            Submit and Book
+          {/* Input fields for customer info */}
+          <TextField label="First Name" value={customerFirstName} onChange={(e) => setCustomerFirstName(e.target.value)} fullWidth margin="normal" />
+          <TextField label="Last Name" value={customerLastName} onChange={(e) => setCustomerLastName(e.target.value)} fullWidth margin="normal" />
+          <TextField label="Email" value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} fullWidth margin="normal" />
+          <TextField label="Phone" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} fullWidth margin="normal" />
+          <TextField label="Additional Notes" value={notes} onChange={(e) => setNotes(e.target.value)} fullWidth margin="normal" />
+          
+          <Button variant="contained" onClick={handleFormSend} sx={{ marginTop: '20px' }}>
+            Confirm Booking
           </Button>
-          <Button variant="contained" onClick={handleCheckoutClose}>
+          <Button variant="outlined" onClick={handleCheckoutClose} sx={{ marginTop: '10px' }}>
             Cancel
           </Button>
         </Box>
       )}
 
-     {/* Hamburger menu for navigation */}
-     <Menu
-        anchorEl={anchorEl} // Anchor element for the menu
-        open={Boolean(anchorEl)} // Open state of the menu
-        onClose={handleMenuClose} // Close the menu
-      >
-        <MenuItem onClick={() => handleNavigation('/customer/home')}>Customer Home</MenuItem> {/* Navigate to Customer Calendar */}
-        <MenuItem onClick={() => handleNavigation('/customer/services')}>Available Services</MenuItem> {/* Navigate to Available Services */}
-        <MenuItem onClick={handleMenuClose}>Close</MenuItem> {/* Close the menu */}
+      {/* Hamburger menu */}
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+        <MenuItem onClick={() => handleNavigation('/customer/home')}>Customer Home</MenuItem>
+        <MenuItem onClick={() => handleNavigation('/customer/services')}>Available Services</MenuItem>
+        <MenuItem onClick={handleMenuClose}>Close</MenuItem>
       </Menu>
     </Box>
   );
 };
 
-// Export the component for use in other parts of the app.
 export default CustomerCalendar;
