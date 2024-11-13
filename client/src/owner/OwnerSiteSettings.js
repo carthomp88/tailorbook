@@ -18,17 +18,6 @@ const OwnerSiteSettings = () => {
   //const days = [hours.sunday, hours.monday, hours.tuesday, hours.wednesday, hours.thursday, hours.friday, hours.saturday]
   const [businessName, setBusinessName] = useState(res.data.name);
   const [businessInfo, setBusinessInfo] = useState(res.data.info);
-  const [displayHours] = useState([
-    hours.sunday.name + ': ' + (hours.sunday.open === 'Closed'?'Closed':(hours.sunday.open + '-' + hours.sunday.close)) + '\n',
-    hours.monday.name + ': ' + (hours.monday.open === 'Closed'?'Closed':(hours.monday.open +  '-' + hours.monday.close)) + '\n',
-    hours.tuesday.name + ': ' + (hours.tuesday.open === 'Closed'?'Closed':(hours.tuesday.open +  '-' + hours.tuesday.close)) + '\n',
-    hours.wednesday.name + ': ' + (hours.wednesday.open === 'Closed'?'Closed':(hours.wednesday.open +  '-' + hours.wednesday.close)) + '\n',
-    hours.thursday.name + ': ' + (hours.thursday.open === 'Closed'?'Closed':(hours.thursday.open +  '-' + hours.thursday.close)) + '\n',
-    hours.friday.name + ': ' + (hours.friday.open === 'Closed'?'Closed':(hours.friday.open +  '-' + hours.friday.close)) + '\n',
-    hours.saturday.name + ': ' + (hours.saturday.open === 'Closed'?'Closed':(hours.saturday.open +  '-' + hours.saturday.close)) + '\n',
-  ])
-  const hoursObj = {hours: ''}
-  displayHours.forEach((day) => hoursObj.hours += day)
   const [sundayOpen, updateSunOpen] = useState(hours.sunday.open)
   const [sundayClose, updateSunClose] = useState(hours.sunday.close)
   const [mondayOpen, updateMonOpen] = useState(hours.monday.open)
@@ -222,7 +211,7 @@ const OwnerSiteSettings = () => {
           ))}
         </Box>
       </Box>
-
+      
       {/* Hours Section */}
       <Box sx={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Typography variant="h5" sx={{ marginBottom: '10px' }}>Hours</Typography>
@@ -342,6 +331,11 @@ const OwnerSiteSettings = () => {
               </Box>
             </Box>
         </Box>
+        <Button
+        onClick={handleSave}>
+          Save Changes
+        </Button>
+        <Typography align='center'>{alertMsg}</Typography>
       </Box>
 
       {/* Single Day Custom Hours Section */}

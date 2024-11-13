@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { AppBar, Box, IconButton, Menu, MenuItem, Toolbar, Typography, Button, Card, CardContent } from '@mui/material';
-import { Menu as MenuIcon } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+import { AppBar, Box, IconButton, List, ListItem, ListItemText, Menu, MenuItem, Toolbar, Typography } from '@mui/material';
+import { Menu as MenuIcon } from '@mui/icons-material'; // Import hamburger menu icon
+import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
+
 import haircutImage from './haircut.jpg';
 import massageImage from './massage.jpg';
 import axios from 'axios';
@@ -14,6 +15,8 @@ const images = {
   Massage: massageImage,
 };
 
+const hours = landing.data.hours
+
 const CustomerHome = () => {
   const { name, info, email, phone, social } = landingData;
   const navigate = useNavigate();
@@ -22,7 +25,30 @@ const CustomerHome = () => {
   // Handle menu open and close
   const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
   const handleMenuClose = () => setAnchorEl(null);
+  
+  const [displayHours] = useState([
+    hours.sunday.name + ': ' + (hours.sunday.open === 'Closed'?'Closed':(hours.sunday.open + '-' + hours.sunday.close)),
+    hours.monday.name + ': ' + (hours.monday.open === 'Closed'?'Closed':(hours.monday.open +  '-' + hours.monday.close)),
+    hours.tuesday.name + ': ' + (hours.tuesday.open === 'Closed'?'Closed':(hours.tuesday.open +  '-' + hours.tuesday.close)),
+    hours.wednesday.name + ': ' + (hours.wednesday.open === 'Closed'?'Closed':(hours.wednesday.open +  '-' + hours.wednesday.close)),
+    hours.thursday.name + ': ' + (hours.thursday.open === 'Closed'?'Closed':(hours.thursday.open +  '-' + hours.thursday.close)),
+    hours.friday.name + ': ' + (hours.friday.open === 'Closed'?'Closed':(hours.friday.open +  '-' + hours.friday.close)),
+    hours.saturday.name + ': ' + (hours.saturday.open === 'Closed'?'Closed':(hours.saturday.open +  '-' + hours.saturday.close)),
+  ])
+  const hoursObj = {hours: ''}
+  displayHours.forEach((day) => hoursObj.hours += day)
 
+  // Handle menu open
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget); // Set the anchor element for the menu
+  };
+
+  // Handle menu close
+  const handleMenuClose = () => {
+    setAnchorEl(null); // Clear the anchor element to close the menu
+  };
+
+  // Function to handle navigation
   const handleNavigation = (path) => {
     navigate(path);
     handleMenuClose();
@@ -75,10 +101,19 @@ const CustomerHome = () => {
           borderRadius: '12px',
           textAlign: 'center',
         }}>
+
           <CardContent>
             <Typography variant="h4" sx={{ color: '#333', fontWeight: '600' }}>{name}</Typography>
             <Typography variant="subtitle1" sx={{ color: '#555', marginY: '10px' }}>{info}</Typography>
             <Typography variant="body1" sx={{ color: '#777' }}>Hours: M-S: 9-5 | Sundays: Closed</Typography>
+            <Typography variant="h5" sx={{ color: '#555555' }}>Hours:</Typography>
+            <List>
+              {displayHours.map((day, index) => (
+                <ListItem key={index}>
+                 <ListItemText secondary={`${day}`}></ListItemText>
+                </ListItem>
+                ))}
+            </List>
           </CardContent>
           <Button
             variant="contained"
@@ -89,6 +124,7 @@ const CustomerHome = () => {
             See Services
           </Button>
         </Card>
+
 
         {/* Right picture box */}
         <Box sx={{
