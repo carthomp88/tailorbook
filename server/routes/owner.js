@@ -28,7 +28,8 @@ router.post('/services', async (req, res) => {
     const service = new Service({
         name: req.body.name,
         desc: req.body.desc,
-        price: req.body.price
+        price: req.body.price,
+        daysOffered: req.body.daysOffered
         // add images here when we figure out what that's about!
     })
     Service.findOne({name: service.name}).then(query => {

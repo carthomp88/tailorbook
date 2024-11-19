@@ -10,6 +10,7 @@ import postData from '../components/functions.js';
 
 const calendarData = await axios.get('http://localhost:8080/customer/calendar');
 const hoursData = await axios.get('http://localhost:8080/landing');
+const serviceData = await axios.get('http://localhost:8080/owner/services')
 
 const hours = [
   hoursData.data.hours.sunday,
@@ -37,6 +38,8 @@ const CustomerCalendar = () => {
   const [customerPhone, setCustomerPhone] = useState('');
   const [notes, setNotes] = useState('');
 
+  const [availableServices, setAvailableServices] = useState([])
+
   const appointments = [];
 
   // Load appointments from calendar data and add sample data for unavailable slots
@@ -45,6 +48,8 @@ const CustomerCalendar = () => {
     appointments.push({ title: 'Unavailable', start: date, end: new Date(moment(date).add(1, 'hours')) });
   });
 
+  const services = serviceData.data.array
+
   const [events] = useState(appointments);
 
   const handleDateSelect = (slotInfo) => {
@@ -52,7 +57,17 @@ const CustomerCalendar = () => {
     setSelectedDate(selectedDate);
     setSelectedService('');
     setSelectedTime('');
+    handleAvailableServices(selectedDate);
   };
+
+  const handleAvailableServices = (date) => {
+    const dow = moment(date).day()
+    const availableServicesOnDate = []
+    services.forEach(service => {
+      if (service.daysOffered.includes(dow)) availableServicesOnDate.push(service.name);
+      setAvailableServices(availableServicesOnDate)
+    })
+  }
 
   const handleServiceChange = (event) => {
     setSelectedService(event.target.value);
@@ -142,6 +157,7 @@ const CustomerCalendar = () => {
             style={{ height: '100%', width: '100%' }}
             selectable
             onSelectSlot={handleDateSelect}
+            onClick={handleDateSelect}
           />
         </Box>
 
@@ -157,8 +173,9 @@ const CustomerCalendar = () => {
             <MenuItem value="" disabled>
               {selectedDate ? 'Select a Service' : 'Select a Date First'}
             </MenuItem>
-            <MenuItem value="Haircut">Haircut</MenuItem>
-            <MenuItem value="Massage">Massage</MenuItem>
+            {availableServices.map((service, index) => (
+              <MenuItem key={index} value={service}>{service}</MenuItem>
+            ))}
           </Select>
 
           <TextField

@@ -12,6 +12,15 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios'
 import postData from '../components/functions.js'
 
+const Checkbox = ({ label, value, onChange }) => {
+  return (
+    <label>
+      <input type="checkbox" checked={value} onChange={onChange} />
+      {label}
+    </label>
+  );
+};
+
 let serviceData = await axios.get('http://localhost:8080/owner/services')
 
 const OwnerServices = () => {
@@ -24,6 +33,15 @@ const OwnerServices = () => {
   const [editingIndex, setEditingIndex] = useState(null); // Tracks index of service being edited
   const [showForm, setShowForm] = useState(false); // Toggle for displaying the service form
   const [services, setServices] = useState(serviceData.data.array); // Stores all services
+
+  const [onSunday, setOnSunday] = useState(false);
+  const [onMonday, setOnMonday] = useState(false);
+  const [onTuesday, setOnTuesday] = useState(false);
+  const [onWednesday, setOnWednesday] = useState(false);
+  const [onThursday, setOnThursday] = useState(false);
+  const [onFriday, setOnFriday] = useState(false);
+  const [onSaturday, setOnSaturday] = useState(false);
+  const [daysOffered, updateDaysOffered] = useState([]);
 
   
   // Load services from localStorage on component mount
@@ -59,12 +77,19 @@ const OwnerServices = () => {
   // Handle adding or updating a service entry
   const handleAddOrUpdateService = async () => {
     if (!serviceName || !serviceDescription || !servicePrice) return;
+    const days = [];
+    let dayNum = 0;
+    daysOffered.forEach(day => {
+      if (day) {days.push(dayNum);}
+      dayNum = dayNum + 1;
+    })
 
     const newService = {
       name: serviceName,
       desc: serviceDescription,
       price: servicePrice,
       image: serviceImage || services[editingIndex]?.image, // Use the existing image if editing
+      daysOffered: days
     };
 
     postData('http://localhost:8080/owner/services', newService)
@@ -179,6 +204,44 @@ const OwnerServices = () => {
             <TextField label="Service Name" value={serviceName} onChange={(e) => setServiceName(e.target.value)} fullWidth variant="outlined" />
             <TextField label="Service Description" value={serviceDescription} onChange={(e) => setServiceDescription(e.target.value)} fullWidth variant="outlined" />
             <TextField label="Service Price" value={servicePrice} onChange={(e) => setServicePrice(e.target.value)} fullWidth variant="outlined" />
+            <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, marginTop: '10px', marginBottom: '10px'}}>
+              <Typography variant="h6">Available on:</Typography>
+              <Checkbox
+                label='Sunday'
+                value={onSunday}
+                onChange={() => {setOnSunday(!onSunday); updateDaysOffered([!onSunday, onMonday, onTuesday, onWednesday, onThursday, onFriday, onSaturday])}}
+              />
+              <Checkbox
+                label='Monday'
+                value={onMonday}
+                onChange={() => {setOnMonday(!onMonday); updateDaysOffered([onSunday, !onMonday, onTuesday, onWednesday, onThursday, onFriday, onSaturday])}}
+              />
+              <Checkbox
+                label='Tuesday'
+                value={onTuesday}
+                onChange={() => {setOnTuesday(!onTuesday); updateDaysOffered([onSunday, onMonday, !onTuesday, onWednesday, onThursday, onFriday, onSaturday])}}
+              />
+              <Checkbox
+                label='Wednesday'
+                value={onWednesday}
+                onChange={() => {setOnWednesday(!onWednesday); updateDaysOffered([onSunday, onMonday, onTuesday, !onWednesday, onThursday, onFriday, onSaturday])}}
+              />
+              <Checkbox
+                label='Thursday'
+                value={onThursday}
+                onChange={() => {setOnThursday(!onThursday); updateDaysOffered([onSunday, onMonday, onTuesday, onWednesday, !onThursday, onFriday, onSaturday])}}
+              />
+              <Checkbox
+                label='Friday'
+                value={onFriday}
+                onChange={() => {setOnFriday(!onFriday); updateDaysOffered([onSunday, onMonday, onTuesday, onWednesday, onThursday, !onFriday, onSaturday])}}
+              />
+              <Checkbox
+                label='Saturday'
+                value={onSaturday}
+                onChange={() => {setOnSaturday(!onSaturday); updateDaysOffered([onSunday, onMonday, onTuesday, onWednesday, onThursday, onFriday, !onSaturday])}}
+              />
+            </Box>
             <TextField type="file" onChange={handleImageUpload} fullWidth variant="outlined" />
 
             {/* Save/Cancel buttons */}
