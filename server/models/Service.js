@@ -6,7 +6,8 @@ const serviceSchema = new Schema({
     desc: String,
     price: Number,
     imgURL: String,
-    time: Number
+    time: Number,
+    daysOffered: [Number]
 })
 
 const Service = model('Service', serviceSchema)

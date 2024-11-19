@@ -9,6 +9,10 @@ import React, { useState, useEffect } from 'react';
 import { AppBar, Box, IconButton, Menu, MenuItem, TextField, Toolbar, Typography, List, ListItem, ListItemText, Fab, Button } from '@mui/material';
 import { Menu as MenuIcon, Delete as DeleteIcon, Add as AddIcon, Edit as EditIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios'
+import postData from '../components/functions.js'
+
+let serviceData = await axios.get('http://localhost:8080/owner/services')
 
 const OwnerServices = () => {
   const navigate = useNavigate();
@@ -19,15 +23,16 @@ const OwnerServices = () => {
   const [serviceImage, setServiceImage] = useState(null); // Stores Base64-encoded service image
   const [editingIndex, setEditingIndex] = useState(null); // Tracks index of service being edited
   const [showForm, setShowForm] = useState(false); // Toggle for displaying the service form
-  const [services, setServices] = useState([]); // Stores all services
+  const [services, setServices] = useState(serviceData.data.array); // Stores all services
+
   
   // Load services from localStorage on component mount
-  useEffect(() => {
+  /*useEffect(() => {
     const savedServices = JSON.parse(localStorage.getItem('services'));
     if (savedServices) {
       setServices(savedServices);
     }
-  }, []);
+  }, []);*/
 
   // Handle opening the menu
   const handleMenuOpen = (event) => {
@@ -45,38 +50,41 @@ const OwnerServices = () => {
     handleMenuClose();
   };
 
-  // Function to save updated services list to localStorage
+  /* Function to save updated services list to localStorage
   const saveServicesToLocalStorage = (updatedServices) => {
     localStorage.setItem('services', JSON.stringify(updatedServices));
     setServices(updatedServices); // Update the services state
-  };
+  };*/
 
   // Handle adding or updating a service entry
-  const handleAddOrUpdateService = () => {
+  const handleAddOrUpdateService = async () => {
     if (!serviceName || !serviceDescription || !servicePrice) return;
 
     const newService = {
       name: serviceName,
-      description: serviceDescription,
+      desc: serviceDescription,
       price: servicePrice,
       image: serviceImage || services[editingIndex]?.image, // Use the existing image if editing
     };
 
-    let updatedServices;
-    if (editingIndex !== null) {
-      // Update an existing service
-      updatedServices = [...services];
-      updatedServices[editingIndex] = newService;
-      setEditingIndex(null);
-    } else {
-      // Add a new service
-      updatedServices = [...services, newService];
-    }
+    postData('http://localhost:8080/owner/services', newService)
+
+    // let updatedServices;
+    // if (editingIndex !== null) {
+    //   // Update an existing service
+    //   updatedServices = [...services];
+    //   updatedServices[editingIndex] = newService;
+    //   setEditingIndex(null);
+    // } else {
+    //   // Add a new service
+    //   updatedServices = [...services, newService];
+    // }
 
     // Save the updated list to localStorage
-    saveServicesToLocalStorage(updatedServices);
+    //saveServicesToLocalStorage(updatedServices);
 
     // Clear input fields and hide form
+    axios.get('http://localhost:8080/owner/services').then(serviceData => setServices(serviceData.data.array))
     setServiceName('');
     setServiceDescription('');
     setServicePrice('');
@@ -86,15 +94,17 @@ const OwnerServices = () => {
 
   // Handle deleting a service from the list
   const handleDeleteService = (index) => {
-    const updatedServices = services.filter((_, i) => i !== index);
-    saveServicesToLocalStorage(updatedServices); // Update localStorage with the new list
+    const serviceToDelete = services.filter((_, i) => i === index);
+    postData('http://localhost:8080/owner/deleteService', serviceToDelete).then()
+    axios.get('http://localhost:8080/owner/services').then(serviceData => setServices(serviceData.data.array))
+    //saveServicesToLocalStorage(updatedServices); // Update localStorage with the new list
   };
 
   // Prepare service data for editing
   const handleEditService = (index) => {
     const service = services[index];
     setServiceName(service.name);
-    setServiceDescription(service.description);
+    setServiceDescription(service.desc);
     setServicePrice(service.price);
     setServiceImage(service.image);
     setEditingIndex(index);
@@ -145,7 +155,7 @@ const OwnerServices = () => {
               {services.map((service, index) => (
                 <ListItem key={index} sx={{ backgroundColor: 'white', marginBottom: '10px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)' }}>
                   <Box component="img" src={service.image} alt={service.name} sx={{ width: '100px', height: '100px', borderRadius: '10px', marginRight: '20px' }} />
-                  <ListItemText primary={service.name} secondary={`${service.description} - ${service.price}`} />
+                  <ListItemText primary={service.name} secondary={`${service.desc} - ${service.price}`} />
                   <IconButton edge="end" aria-label="edit" onClick={() => handleEditService(index)}><EditIcon /></IconButton>
                   <IconButton edge="end" aria-label="delete" onClick={() => handleDeleteService(index)}><DeleteIcon /></IconButton>
                 </ListItem>
@@ -172,7 +182,7 @@ const OwnerServices = () => {
             <TextField type="file" onChange={handleImageUpload} fullWidth variant="outlined" />
 
             {/* Save/Cancel buttons */}
-            <Button variant="contained" color="primary" onClick={handleAddOrUpdateService} disabled={!serviceName || !serviceDescription || !servicePrice || (!serviceImage && editingIndex === null)}>
+            <Button variant="contained" color="primary" onClick={handleAddOrUpdateService} disabled={!serviceName || !serviceDescription || !servicePrice /*|| (!serviceImage && editingIndex === null)*/}>
               {editingIndex !== null ? 'Save Changes' : 'Add Service'}
             </Button>
             <Button variant="outlined" color="secondary" onClick={() => { setShowForm(false); setEditingIndex(null); }}>

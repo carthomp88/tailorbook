@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AppBar, Box, IconButton, List, ListItem, ListItemText, Menu, MenuItem, Toolbar, Typography } from '@mui/material';
+import { AppBar, Box, Button, Card, CardContent, IconButton, List, ListItem, ListItemText, Menu, MenuItem, Toolbar, Typography } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material'; // Import hamburger menu icon
 import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
 
@@ -8,23 +8,24 @@ import massageImage from './massage.jpg';
 import axios from 'axios';
 
 // Fetch landing data from server
-const landingData = await axios.get('http://localhost:8080/landing').then(res => res.data);
+const landingData = await axios.get('http://localhost:8080/landing');
 
 const images = {
   Haircut: haircutImage,
   Massage: massageImage,
 };
 
-const hours = landing.data.hours
+const hours = landingData.data.hours
 
 const CustomerHome = () => {
-  const { name, info, email, phone, social } = landingData;
+  const name = landingData.data.name
+  const info = landingData.data.info
+  const email = landingData.data.email
+  const phone = landingData.data.phone
+  const social = landingData.data.social
+
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
-
-  // Handle menu open and close
-  const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
-  const handleMenuClose = () => setAnchorEl(null);
   
   const [displayHours] = useState([
     hours.sunday.name + ': ' + (hours.sunday.open === 'Closed'?'Closed':(hours.sunday.open + '-' + hours.sunday.close)),
@@ -103,10 +104,8 @@ const CustomerHome = () => {
         }}>
 
           <CardContent>
-            <Typography variant="h4" sx={{ color: '#333', fontWeight: '600' }}>{name}</Typography>
-            <Typography variant="subtitle1" sx={{ color: '#555', marginY: '10px' }}>{info}</Typography>
-            <Typography variant="body1" sx={{ color: '#777' }}>Hours: M-S: 9-5 | Sundays: Closed</Typography>
-            <Typography variant="h5" sx={{ color: '#555555' }}>Hours:</Typography>
+            <Typography variant="h5" sx={{ color: '#555', marginY: '10px' }}>{info}</Typography>
+            <Typography variant="subtitle" sx={{ color: '#555555' }}>Hours:</Typography>
             <List>
               {displayHours.map((day, index) => (
                 <ListItem key={index}>

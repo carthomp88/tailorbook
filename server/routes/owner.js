@@ -24,4 +24,27 @@ router.get('/services', async (req, res) => {
     .catch(err => res.json(err))
 })
 
+router.post('/services', async (req, res) => {
+    const service = new Service({
+        name: req.body.name,
+        desc: req.body.desc,
+        price: req.body.price
+        // add images here when we figure out what that's about!
+    })
+    Service.findOne({name: service.name}).then(query => {
+        if (query) {
+            Service.updateOne({ // this means that the service exists and needs updating
+            desc: service.desc,
+            price: service.price
+            // add images here when we figure out what that's about!
+            }).then()
+        } else service.save() // if it doesn't exist, save to db
+    })
+})
+
+router.post('/deleteService', async (req, res) => {
+    const service = req.body
+    Service.deleteOne({name: service[0].name}).then()
+})
+
 module.exports = router;
