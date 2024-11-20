@@ -33,6 +33,7 @@ const OwnerServices = () => {
   const [editingIndex, setEditingIndex] = useState(null); // Tracks index of service being edited
   const [showForm, setShowForm] = useState(false); // Toggle for displaying the service form
   const [services, setServices] = useState(serviceData.data.array); // Stores all services
+  const [serviceTime, setServiceTime] = useState('');
 
   const [onSunday, setOnSunday] = useState(false);
   const [onMonday, setOnMonday] = useState(false);
@@ -89,7 +90,8 @@ const OwnerServices = () => {
       desc: serviceDescription,
       price: servicePrice,
       image: serviceImage || services[editingIndex]?.image, // Use the existing image if editing
-      daysOffered: days
+      daysOffered: days,
+      time: serviceTime
     };
 
     postData('http://localhost:8080/owner/services', newService)
@@ -114,6 +116,14 @@ const OwnerServices = () => {
     setServiceDescription('');
     setServicePrice('');
     setServiceImage(null);
+    setOnSunday(false)
+    setOnMonday(false)
+    setOnTuesday(false)
+    setOnWednesday(false)
+    setOnThursday(false)
+    setOnFriday(false)
+    setOnSaturday(false)
+    updateDaysOffered([false, false, false, false, false, false, false])
     setShowForm(false);
   };
 
@@ -204,6 +214,7 @@ const OwnerServices = () => {
             <TextField label="Service Name" value={serviceName} onChange={(e) => setServiceName(e.target.value)} fullWidth variant="outlined" />
             <TextField label="Service Description" value={serviceDescription} onChange={(e) => setServiceDescription(e.target.value)} fullWidth variant="outlined" />
             <TextField label="Service Price" value={servicePrice} onChange={(e) => setServicePrice(e.target.value)} fullWidth variant="outlined" />
+            <TextField label="Service Time (Minutes)" value={serviceTime} onChange={(e) => setServiceTime(e.target.value)} fullWidth variant="outlined" />
             <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, marginTop: '10px', marginBottom: '10px'}}>
               <Typography variant="h6">Available on:</Typography>
               <Checkbox
@@ -248,7 +259,17 @@ const OwnerServices = () => {
             <Button variant="contained" color="primary" onClick={handleAddOrUpdateService} disabled={!serviceName || !serviceDescription || !servicePrice /*|| (!serviceImage && editingIndex === null)*/}>
               {editingIndex !== null ? 'Save Changes' : 'Add Service'}
             </Button>
-            <Button variant="outlined" color="secondary" onClick={() => { setShowForm(false); setEditingIndex(null); }}>
+            <Button variant="outlined" color="secondary" onClick={() => { 
+              setShowForm(false); 
+              setEditingIndex(null); 
+              setOnSunday(false)
+              setOnMonday(false)
+              setOnTuesday(false)
+              setOnWednesday(false)
+              setOnThursday(false)
+              setOnFriday(false)
+              setOnSaturday(false)
+              updateDaysOffered([false, false, false, false, false, false, false])}}>
               Cancel
             </Button>
           </Box>
