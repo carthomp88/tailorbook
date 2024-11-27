@@ -32,6 +32,8 @@ const OwnerSiteSettings = () => {
   const [fridayClose, updateFriClose] = useState(hours.friday.close)
   const [saturdayOpen, updateSatOpen] = useState(hours.saturday.open)
   const [saturdayClose, updateSatClose] = useState(hours.saturday.close)
+  const [showPreview, setShowPreview] = useState(false);
+
 
 
   const [businessHours, setBusinessHours] = useState('Hours: M-S: 9-5 | Sundays: Closed');
@@ -52,21 +54,33 @@ const OwnerSiteSettings = () => {
   const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
   const handleMenuClose = () => setAnchorEl(null);
 
-  // Function to handle logo image upload and preview
   const handleLogoUpload = (event) => {
     const file = event.target.files[0];
-    if (file) setLogo(URL.createObjectURL(file)); // Create a preview URL for the uploaded logo
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setLogo(reader.result); // Set image preview URL
+        localStorage.setItem('logo', reader.result); // Save the base64 image to local storage
+      };
+      reader.readAsDataURL(file);
+    }
   };
-
-  // Function to handle individual service image upload and preview
+  
   const handleServiceImageUpload = (index, event) => {
     const file = event.target.files[0];
     if (file) {
-      const newImages = [...serviceImages];
-      newImages[index] = URL.createObjectURL(file); // Create preview URL for the specific service image
-      setServiceImages(newImages);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const newImages = [...serviceImages];
+        newImages[index] = reader.result; // Update the service images in state
+        setServiceImages(newImages);
+        localStorage.setItem('serviceImages', JSON.stringify(newImages)); // Save all images to local storage
+      };
+      reader.readAsDataURL(file);
     }
   };
+  
+  
 
   const handleSave = () => {
     const data = {
@@ -113,10 +127,13 @@ const OwnerSiteSettings = () => {
         }
       }
     }
-    postData('http://localhost:8080/landing', data)
-    setAlert('Saved')
-  }
+    postData('http://localhost:8080/landing', data);
+    setAlert('Saved');
+    setShowPreview(true); // Set the preview to be visible
+  };
+  
 
+  
   return (
     <Box sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh', paddingBottom: '100px' }}>
       {/* AppBar with Business Logo and Title */}
@@ -388,6 +405,204 @@ const OwnerSiteSettings = () => {
         <Typography align='center'>{alertMsg}</Typography>
       </Box>
 
+            {/* show preview Section */}
+      {showPreview && (
+  <Box sx={{ 
+    padding: '24px', 
+    textAlign: 'center', 
+    backgroundColor: '#f5f5f5', 
+    marginTop: '20px', 
+    borderRadius: '12px',
+    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+    maxWidth: '600px',
+    margin: '20px auto'
+  }}>
+    <Typography 
+      variant="h4" 
+      sx={{ 
+        marginBottom: '16px', 
+        color: 'primary.main', 
+        fontWeight: 'bold' 
+      }}
+    >
+      Live Preview
+    </Typography>
+    
+    <Typography 
+      variant="h5" 
+      sx={{ 
+        marginBottom: '12px', 
+        color: 'text.primary' 
+      }}
+    >
+      {businessName}
+    </Typography>
+    
+    <Typography 
+      variant="body1" 
+      sx={{ 
+        marginBottom: '20px', 
+        color: 'text.secondary' 
+      }}
+    >
+      {businessInfo}
+    </Typography>
+    
+    <Box sx={{ 
+      backgroundColor: 'background.paper', 
+      borderRadius: '8px', 
+      padding: '16px', 
+      marginBottom: '16px',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+    }}>
+      <Typography 
+        variant="subtitle1" 
+        sx={{ 
+          marginBottom: '12px', 
+          fontWeight: 'bold' 
+        }}
+      >
+        Business Hours
+      </Typography>
+      <Box>
+        <Typography variant="body2" sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+          <span style={{ color: 'text.secondary' }}>Sunday:</span>
+          <span>{sundayOpen} - {sundayClose}</span>
+        </Typography>
+        <Typography variant="body2" sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+          <span style={{ color: 'text.secondary' }}>Monday:</span>
+          <span>{mondayOpen} - {mondayClose}</span>
+        </Typography>
+        <Typography variant="body2" sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+          <span style={{ color: 'text.secondary' }}>Tuesday:</span>
+          <span>{tuesdayOpen} - {tuesdayClose}</span>
+        </Typography>
+        <Typography variant="body2" sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+          <span style={{ color: 'text.secondary' }}>Wednesday:</span>
+          <span>{wednesdayOpen} - {wednesdayClose}</span>
+        </Typography>
+        <Typography variant="body2" sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+          <span style={{ color: 'text.secondary' }}>Thursday:</span>
+          <span>{thursdayOpen} - {thursdayClose}</span>
+        </Typography>
+        <Typography variant="body2" sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+          <span style={{ color: 'text.secondary' }}>Friday:</span>
+          <span>{fridayOpen} - {fridayClose}</span>
+        </Typography>
+        <Typography variant="body2" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <span style={{ color: 'text.secondary' }}>Saturday:</span>
+          <span>{saturdayOpen} - {saturdayClose}</span>
+        </Typography>
+      </Box>
+    </Box>
+    
+    <Box sx={{ 
+      backgroundColor: 'background.paper', 
+      borderRadius: '8px', 
+      padding: '16px', 
+      marginBottom: '16px',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+    }}>
+      <Typography 
+        variant="subtitle1" 
+        sx={{ 
+          marginBottom: '12px', 
+          fontWeight: 'bold' 
+        }}
+      >
+        Contact Information
+      </Typography>
+      <Box>
+        <Typography variant="body2" color="text.secondary" sx={{ marginBottom: '8px' }}>
+          Email: <Typography component="span" color="text.primary">{contactEmail}</Typography>
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ marginBottom: '8px' }}>
+          Phone: <Typography component="span" color="text.primary">{contactPhone}</Typography>
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Social Media: <Typography component="span" color="text.primary">{contactSocial}</Typography>
+        </Typography>
+      </Box>
+    </Box>
+    
+    {logo && (
+      <Box sx={{ 
+        backgroundColor: 'background.paper', 
+        borderRadius: '8px', 
+        padding: '16px', 
+        marginBottom: '16px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center'
+      }}>
+        <Typography 
+          variant="subtitle1" 
+          sx={{ 
+            marginBottom: '12px', 
+            fontWeight: 'bold' 
+          }}
+        >
+          Logo
+        </Typography>
+        <img 
+          src={logo} 
+          alt="Business Logo" 
+          style={{ 
+            maxWidth: '200px', 
+            borderRadius: '8px',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+          }} 
+        />
+      </Box>
+    )}
+    
+    {serviceImages.length > 0 && (
+      <Box sx={{ 
+        backgroundColor: 'background.paper', 
+        borderRadius: '8px', 
+        padding: '16px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center'
+      }}>
+        <Typography 
+          variant="subtitle1" 
+          sx={{ 
+            marginBottom: '12px', 
+            fontWeight: 'bold' 
+          }}
+        >
+          Service Images
+        </Typography>
+        <Box sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'center',
+          gap: '16px'
+        }}>
+          {serviceImages.map((image, index) => (
+            image && (
+              <img 
+                key={index} 
+                src={image} 
+                alt={`Service ${index + 1}`} 
+                style={{ 
+                  maxWidth: '200px', 
+                  borderRadius: '8px',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                }} 
+              />
+            )
+          ))}
+        </Box>
+      </Box>
+    )}
+  </Box>
+)}
+
+
       {/* Hamburger Menu */}
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
         <MenuItem onClick={() => navigate('/owner/home')}>Dashboard</MenuItem>
@@ -401,3 +616,5 @@ const OwnerSiteSettings = () => {
 };
 
 export default OwnerSiteSettings;
+
+
