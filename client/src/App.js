@@ -1,6 +1,4 @@
-
 import React from 'react';
-
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LandingPage from './components/LandingPage';
 import Register from './components/Register';
@@ -11,7 +9,6 @@ import CustomerCalendar from './customer/CustomerCalendar';
 import OwnerServices from './owner/OwnerServices';
 import OwnerSiteSettings from './owner/OwnerSiteSettings';
 import CustomerServices from './customer/CustomerServices';
-
 
 function App() {
   return (
@@ -34,4 +31,3 @@ function App() {
 }
 
 export default App;
-
