@@ -53,10 +53,10 @@ router.post('/book', async (req, res) => {
         `;
         await sendEmail(req.body.email, subject, htmlContent);
 
-        res.status(200).send('Booking confirmed and email sent.');
+        //res.status(200).send('Booking confirmed and email sent.');
     } catch (error) {
         console.error('Error during booking:', error);
-        res.status(500).send('Error during booking.');
+        //res.status(500).send('Error during booking.');
     }
 });
 

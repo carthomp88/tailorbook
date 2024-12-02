@@ -31,10 +31,10 @@ router.post('/', async (req, res) => {
         `;
         await sendEmail(req.body.email, subject, htmlContent);
 
-        res.status(201).send('Appointment confirmed and email sent.');
+        //res.status(201).send(JSON.stringify('Appointment confirmed and email sent.'));
     } catch (error) {
         console.error('Error creating appointment:', error);
-        res.status(500).send('Error creating appointment.');
+        //res.status(500).send('Error creating appointment.');
     }
 });
 

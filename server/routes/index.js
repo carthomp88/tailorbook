@@ -8,7 +8,6 @@ const Days = require('../models/Day');
 const sendEmail = require('../emailService'); // Import email service
 
 router.get('/', (req, res) => {
-    console.log('absolutely baller man');
 });
 
 router.post('/login', (req, res) => {
@@ -29,7 +28,6 @@ router.post('/check', (req, res) => {
 });
 
 router.post('/register', (req, res) => {
-    console.log('hellooooo??????//');
     // salt and hash the password
     const user = new User({
         firstName: req.body.firstName,
@@ -56,8 +54,7 @@ router.post('/register', (req, res) => {
                             console.log(err);
                             return;
                         }
-                        console.log(hash);
-                        User.updateOne({ email: user.email }, { $set: { password: hash } }).then(console.log('done'));
+                        User.updateOne({ email: user.email }, { $set: { password: hash } }).then();
                     });
                 });
 
