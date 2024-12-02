@@ -132,7 +132,6 @@ const OwnerServices = () => {
     const serviceToDelete = services.filter((_, i) => i === index);
     postData('http://localhost:8080/owner/deleteService', serviceToDelete).then()
     axios.get('http://localhost:8080/owner/services').then(serviceData => setServices(serviceData.data.array))
-    //saveServicesToLocalStorage(updatedServices); // Update localStorage with the new list
   };
 
   // Prepare service data for editing
@@ -191,8 +190,8 @@ const OwnerServices = () => {
                 <ListItem key={index} sx={{ backgroundColor: 'white', marginBottom: '10px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)' }}>
                   <Box component="img" src={service.image} alt={service.name} sx={{ width: '100px', height: '100px', borderRadius: '10px', marginRight: '20px' }} />
                   <ListItemText primary={service.name} secondary={`${service.desc} - ${service.price}`} />
-                  <IconButton edge="end" aria-label="edit" onClick={() => handleEditService(index)}><EditIcon /></IconButton>
-                  <IconButton edge="end" aria-label="delete" onClick={() => handleDeleteService(index)}><DeleteIcon /></IconButton>
+                  <IconButton edge="end" aria-label="edit" onClick={() => {handleEditService(index); this.forceUpdate()}}><EditIcon /></IconButton>
+                  <IconButton edge="end" aria-label="delete" onClick={() => {handleDeleteService(index); this.forceUpdate()}}><DeleteIcon /></IconButton>
                 </ListItem>
               ))}
             </List>

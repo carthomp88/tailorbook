@@ -29,14 +29,16 @@ router.post('/services', async (req, res) => {
         name: req.body.name,
         desc: req.body.desc,
         price: req.body.price,
-        daysOffered: req.body.daysOffered
+        daysOffered: req.body.daysOffered,
+        time: req.body.time
         // add images here when we figure out what that's about!
     })
     Service.findOne({name: service.name}).then(query => {
         if (query) {
             Service.updateOne({ // this means that the service exists and needs updating
             desc: service.desc,
-            price: service.price
+            price: service.price,
+            time: service.time
             // add images here when we figure out what that's about!
             }).then()
         } else service.save() // if it doesn't exist, save to db
