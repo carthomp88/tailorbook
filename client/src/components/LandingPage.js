@@ -1,4 +1,4 @@
-import React, { useState } from 'react'; // Import React and useState for managing component state
+import React, { useState, useEffect } from 'react'; // Import React and useState for managing component state
 //import axios from 'axios' // Import Axios for API calls to the backend
 import { Box, Button, Typography, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Link, DialogContentText } from '@mui/material'; // Import necessary Material-UI components
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for routing
@@ -31,6 +31,15 @@ const LandingPage = () => {
   const [password, setPassword] = useState(''); // State to manage password input
   const [alertmsg, setAlert] = useState('')
 
+  useEffect(() => {
+    const loggedInUser = localStorage.getItem("user");
+    if (loggedInUser) {
+      const foundUser = JSON.parse(loggedInUser);
+      if (foundUser.type === 'Owner' || foundUser.type === 'Both') navigate('/owner/home')
+      else navigate('/customer/home')
+    }
+  });
+
   // Case manager for the user object returned from the DB
   // Pre: A user object, or an empty object
   // Post:  Handles the login result in the dialog box.
@@ -47,9 +56,7 @@ const LandingPage = () => {
       if (val !== -1) return val
       else return -1
     }
-
     const userType = isCustomer ? 'Customer' : 'Owner'
-    
     const resolveCase = async (caseNum) => {
       switch (caseNum) {
         case 3:
@@ -66,6 +73,14 @@ const LandingPage = () => {
             caseMsg.msg = "Success"
             //console.log(caseMsg.msg)
             if (isCustomer) {
+              const savedUser = {
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                phone: user.phone,
+                type: user.type
+              }
+              localStorage.setItem('user', JSON.stringify(savedUser))
               navigate('/customer/home'); // Navigate to Customer Home
             } else {
               navigate('/owner/home'); // Navigate to Owner Home

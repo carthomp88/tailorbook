@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppBar, Box, IconButton, TextField, Toolbar, Typography, Menu, MenuItem, Button } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
@@ -13,11 +13,11 @@ const OwnerSiteSettings = () => {
   // Menu anchor state for the hamburger menu
   const [anchorEl, setAnchorEl] = useState(null);
 
-  // State variables for business information
+  // State variables for business and hours information
   const hours = res.data.hours
-  //const days = [hours.sunday, hours.monday, hours.tuesday, hours.wednesday, hours.thursday, hours.friday, hours.saturday]
   const [businessName, setBusinessName] = useState(res.data.name);
   const [businessInfo, setBusinessInfo] = useState(res.data.info);
+
   const [sundayOpen, updateSunOpen] = useState(hours.sunday.open)
   const [sundayClose, updateSunClose] = useState(hours.sunday.close)
   const [mondayOpen, updateMonOpen] = useState(hours.monday.open)
@@ -32,9 +32,8 @@ const OwnerSiteSettings = () => {
   const [fridayClose, updateFriClose] = useState(hours.friday.close)
   const [saturdayOpen, updateSatOpen] = useState(hours.saturday.open)
   const [saturdayClose, updateSatClose] = useState(hours.saturday.close)
+
   const [showPreview, setShowPreview] = useState(false);
-
-
 
   const [businessHours, setBusinessHours] = useState('Hours: M-S: 9-5 | Sundays: Closed');
 
@@ -49,6 +48,16 @@ const OwnerSiteSettings = () => {
 
   // State for successful save alert
   const [alertMsg, setAlert] = useState('')
+
+  // this hook prevents non-owners from accessing the owner side, instead returning them to login
+  useEffect(() => {
+    const loggedInUser = localStorage.getItem("user");
+    if (loggedInUser) {
+      const foundUser = JSON.parse(loggedInUser);
+      if (foundUser.type === 'Owner' || foundUser.type === 'Both');
+      else navigate('/')
+    }
+  });
 
   // Handle the menu open and close
   const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
@@ -608,7 +617,7 @@ const OwnerSiteSettings = () => {
         <MenuItem onClick={() => navigate('/owner/home')}>Dashboard</MenuItem>
         <MenuItem onClick={() => navigate('/owner/services')}>Manage Services</MenuItem>
         <MenuItem onClick={() => navigate('/owner/calendar')}>View Calendar</MenuItem>
-        <MenuItem onClick={() => navigate('/owner/site-preview')}>Preview Site</MenuItem>
+        <MenuItem onClick={() => {localStorage.clear(); navigate('/')}}>Log Out</MenuItem>
         <MenuItem onClick={handleMenuClose}>Close</MenuItem>
       </Menu>
     </Box>

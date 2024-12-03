@@ -151,6 +151,7 @@ const AvailableServices = () => {
       >
         <MenuItem onClick={() => handleNavigation('/customer/home')}>Customer Home</MenuItem>
         <MenuItem onClick={() => handleNavigation('/customer/calendar')}>Customer Calendar</MenuItem>
+        <MenuItem onClick={() => {localStorage.clear(); navigate('/')}}>Log Out</MenuItem>
         <MenuItem onClick={handleMenuClose}>Close</MenuItem>
       </Menu>
     </Box>

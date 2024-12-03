@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppBar, Box, Button, IconButton, Menu, MenuItem, Select, Toolbar, Typography, TextField } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
@@ -9,23 +9,13 @@ import axios from 'axios';
 import postData from '../components/functions.js';
 
 const calendarData = await axios.get('http://localhost:8080/customer/calendar');
-const hoursData = await axios.get('http://localhost:8080/landing');
 const serviceData = await axios.get('http://localhost:8080/owner/services')
-
-const hours = [
-  hoursData.data.hours.sunday,
-  hoursData.data.hours.monday,
-  hoursData.data.hours.tuesday,
-  hoursData.data.hours.wednesday,
-  hoursData.data.hours.thursday,
-  hoursData.data.hours.friday,
-  hoursData.data.hours.saturday,
-];
 
 const localizer = momentLocalizer(moment);
 
 const CustomerCalendar = () => {
   const navigate = useNavigate();
+
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedService, setSelectedService] = useState('');
   const [selectedDate, setSelectedDate] = useState(moment().format('YYYY-MM-DD'));
@@ -37,6 +27,20 @@ const CustomerCalendar = () => {
   const [customerEmail, setCustomerEmail] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [notes, setNotes] = useState('');
+
+  
+
+  // this hook gets the user from local storage to put their data in the form automatically
+  useEffect(() => {
+    const loggedInUser = localStorage.getItem("user");
+    if (loggedInUser) {
+      const foundUser = JSON.parse(loggedInUser);
+      setCustomerEmail(foundUser.email)
+      setCustomerFirstName(foundUser.firstName)
+      setCustomerLastName(foundUser.lastName)
+      setCustomerPhone(foundUser.phone)
+    }
+  }, []);
 
   const [availableServices, setAvailableServices] = useState([])
 
@@ -255,6 +259,7 @@ const CustomerCalendar = () => {
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
         <MenuItem onClick={() => handleNavigation('/customer/home')}>Customer Home</MenuItem>
         <MenuItem onClick={() => handleNavigation('/customer/services')}>Available Services</MenuItem>
+        <MenuItem onClick={() => {localStorage.clear(); navigate('/')}}>Log Out</MenuItem>
         <MenuItem onClick={handleMenuClose}>Close</MenuItem>
       </Menu>
     </Box>

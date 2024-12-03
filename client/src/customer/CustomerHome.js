@@ -163,6 +163,7 @@ const CustomerHome = () => {
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
         <MenuItem onClick={() => handleNavigation('/customer/calendar')}>Customer Calendar</MenuItem>
         <MenuItem onClick={() => handleNavigation('/customer/services')}>Available Services</MenuItem>
+        <MenuItem onClick={() => {localStorage.clear(); navigate('/')}}>Log Out</MenuItem>
         <MenuItem onClick={handleMenuClose}>Close</MenuItem>
       </Menu>
     </Box>
