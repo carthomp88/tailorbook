@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppBar, Box, IconButton, Menu, MenuItem, Toolbar, Typography, List, ListItem, ListItemText } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material'; // Import hamburger menu icon
 import { useNavigate } from 'react-router-dom';
@@ -15,6 +15,16 @@ const OwnerHome = () => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null); // State for managing hamburger menu visibility
   const [selectedDate, setSelectedDate] = useState(moment().toDate()); // Default to today's date
+
+  // this hook prevents non-owners from accessing the owner side, instead returning them to login
+  useEffect(() => {
+    const loggedInUser = localStorage.getItem("user");
+    if (loggedInUser) {
+      const foundUser = JSON.parse(loggedInUser);
+      if (foundUser.type === 'Owner' || foundUser.type === 'Both');
+      else navigate('/')
+    }
+  });
 
   // Example appointment data (replace with actual data source)
   const appointments = [];
@@ -106,6 +116,7 @@ const OwnerHome = () => {
         <MenuItem onClick={() => navigate('/owner/services')}>Manage Services</MenuItem>
         <MenuItem onClick={() => navigate('/owner/calendar')}>View Calendar</MenuItem>
         <MenuItem onClick={() => navigate('/owner/site-settings')}>Site Settings</MenuItem>
+        <MenuItem onClick={() => {localStorage.clear(); navigate('/')}}>Log Out</MenuItem>
         <MenuItem onClick={handleMenuClose}>Close</MenuItem>
       </Menu>
     </Box>

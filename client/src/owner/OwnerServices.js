@@ -44,14 +44,15 @@ const OwnerServices = () => {
   const [onSaturday, setOnSaturday] = useState(false);
   const [daysOffered, updateDaysOffered] = useState([]);
 
-  
-  // Load services from localStorage on component mount
-  /*useEffect(() => {
-    const savedServices = JSON.parse(localStorage.getItem('services'));
-    if (savedServices) {
-      setServices(savedServices);
+  // this hook prevents non-owners from accessing the owner side, instead returning them to login
+  useEffect(() => {
+    const loggedInUser = localStorage.getItem("user");
+    if (loggedInUser) {
+      const foundUser = JSON.parse(loggedInUser);
+      if (foundUser.type === 'Owner' || foundUser.type === 'Both');
+      else navigate('/')
     }
-  }, []);*/
+  });
 
   // Handle opening the menu
   const handleMenuOpen = (event) => {
@@ -176,6 +177,7 @@ const OwnerServices = () => {
         <MenuItem onClick={() => handleNavigation('/owner/home')}>Owner Home</MenuItem>
         <MenuItem onClick={() => handleNavigation('/owner/calendar')}>Owner Calendar</MenuItem>
         <MenuItem onClick={() => navigate('/owner/site-settings')}>Site Settings</MenuItem>
+        <MenuItem onClick={() => {localStorage.clear(); navigate('/')}}>Log Out</MenuItem>
         <MenuItem onClick={handleMenuClose}>Close</MenuItem>
       </Menu>
 
