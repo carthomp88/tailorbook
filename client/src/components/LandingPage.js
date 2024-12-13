@@ -4,6 +4,7 @@ import { Box, Button, Typography, Dialog, DialogTitle, DialogContent, DialogActi
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for routing
 import logo from './TailorBook.png'; // Import logo image
 
+// Posts a data object to the main express route (in this case, usually login info)
 async function postData(url = "", data = {}) {
   const response = await fetch(url, {
     method: "POST",
@@ -18,10 +19,13 @@ async function postData(url = "", data = {}) {
   return await response.json();
 }
 
+// Confirms password and hash match in the backend
+// For various reasons, it's more practical than trying to do that here
 async function confirmMatch(data) {
   const check = await postData('http://localhost:8080/check', data)
   return await check
 }
+
 
 const LandingPage = () => {
   // State to manage dialog visibility and user type (customer or owner)
@@ -31,6 +35,8 @@ const LandingPage = () => {
   const [password, setPassword] = useState(''); // State to manage password input
   const [alertmsg, setAlert] = useState('')
 
+  // If a user is already logged in, going to the landing page instead redirects to the home page of that user's side
+  // e.g. owners go right to the Owner Dashboard, customers go right to Customer Home
   useEffect(() => {
     const loggedInUser = localStorage.getItem("user");
     if (loggedInUser) {
